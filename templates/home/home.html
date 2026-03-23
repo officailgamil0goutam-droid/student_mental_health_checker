@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindMate — Student Mental Wellness AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS — Default: Lavender Dusk ===== */
+    :root {
+      --cream:      #faf8f5;
+      --paper:      #f4f1ec;
+      --lavender:   #e8e4f3;
+      --sage:       #dde8e2;
+      --sky:        #dceef7;
+      --blush:      #f5e8e4;
+      --mist:       #eef2f7;
+      --ink:        #2c2a35;
+      --ink-light:  #5c5870;
+      --ink-faint:  #9492a0;
+      --accent:     #7b6fa8;
+      --accent-2:   #5a8f7b;
+      --accent-3:   #c08060;
+      --radius-sm:  10px;
+      --radius-md:  18px;
+      --radius-lg:  28px;
+      --radius-xl:  40px;
+      --shadow-soft: 0 4px 24px rgba(100,90,130,0.08);
+      --shadow-card: 0 2px 16px rgba(100,90,130,0.10);
+      --font-display: 'Lora', Georgia, serif;
+      --font-body:    'DM Sans', sans-serif;
+      --hero-grad-1: rgba(232,228,243,0.7);
+      --hero-grad-2: rgba(221,232,226,0.6);
+      --hero-grad-3: rgba(220,238,247,0.4);
+      --blob-grad: linear-gradient(135deg, var(--lavender) 0%, var(--sky) 50%, var(--sage) 100%);
+      --cta-grad: linear-gradient(135deg, var(--lavender) 0%, var(--sky) 50%, var(--sage) 100%);
+      --helpline-grad: linear-gradient(135deg, rgba(221,232,226,0.4) 0%, rgba(220,238,247,0.4) 100%);
+      --helpline-border: rgba(90,143,123,0.25);
+      --transition-theme: background 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+    }
+    [data-theme="ocean"] {
+      --cream:#f0f7f9;--paper:#e6f2f6;--lavender:#cce8f0;--sage:#d4eae8;--sky:#b8dff0;--blush:#e0f0f5;--mist:#d8eef5;
+      --ink:#1a3540;--ink-light:#3a6070;--ink-faint:#7aa0ac;--accent:#2f8cac;--accent-2:#3a9e8e;--accent-3:#5b9fba;
+      --shadow-soft:0 4px 24px rgba(30,100,130,0.09);--shadow-card:0 2px 16px rgba(30,100,130,0.11);
+      --hero-grad-1:rgba(180,220,240,0.6);--hero-grad-2:rgba(160,215,210,0.5);--hero-grad-3:rgba(190,230,245,0.4);
+      --blob-grad:linear-gradient(135deg,#cce8f0 0%,#b8dff0 50%,#d4eae8 100%);
+      --cta-grad:linear-gradient(135deg,#cce8f0 0%,#b8dff0 50%,#d4eae8 100%);
+      --helpline-grad:linear-gradient(135deg,rgba(160,215,210,0.4) 0%,rgba(180,220,240,0.4) 100%);
+      --helpline-border:rgba(42,140,170,0.25);
+    }
+    [data-theme="forest"] {
+      --cream:#f3f7f2;--paper:#eaf2e8;--lavender:#d4e8d0;--sage:#c8e0c4;--sky:#d8edd4;--blush:#e8f2e4;--mist:#deeeda;
+      --ink:#1e3020;--ink-light:#3c5a3e;--ink-faint:#7a9e7c;--accent:#4a7c5a;--accent-2:#5e9468;--accent-3:#8ab878;
+      --shadow-soft:0 4px 24px rgba(40,90,45,0.09);--shadow-card:0 2px 16px rgba(40,90,45,0.11);
+      --hero-grad-1:rgba(180,220,175,0.6);--hero-grad-2:rgba(160,210,165,0.55);--hero-grad-3:rgba(195,230,190,0.4);
+      --blob-grad:linear-gradient(135deg,#d4e8d0 0%,#c8e0c4 50%,#d8edd4 100%);
+      --cta-grad:linear-gradient(135deg,#d4e8d0 0%,#c8e0c4 50%,#d8edd4 100%);
+      --helpline-grad:linear-gradient(135deg,rgba(160,210,165,0.4) 0%,rgba(180,220,175,0.4) 100%);
+      --helpline-border:rgba(74,124,90,0.25);
+    }
+    [data-theme="sunset"] {
+      --cream:#fdf6f3;--paper:#faeee9;--lavender:#f5ddd6;--sage:#f0d8cc;--sky:#f8e8e0;--blush:#fce0d4;--mist:#f8ece6;
+      --ink:#3a1f18;--ink-light:#6a4038;--ink-faint:#a07870;--accent:#c0604a;--accent-2:#d4826a;--accent-3:#e8a090;
+      --shadow-soft:0 4px 24px rgba(150,70,55,0.09);--shadow-card:0 2px 16px rgba(150,70,55,0.11);
+      --hero-grad-1:rgba(240,200,190,0.65);--hero-grad-2:rgba(245,215,200,0.55);--hero-grad-3:rgba(250,225,215,0.4);
+      --blob-grad:linear-gradient(135deg,#f5ddd6 0%,#fce0d4 50%,#f0d8cc 100%);
+      --cta-grad:linear-gradient(135deg,#f5ddd6 0%,#fce0d4 50%,#f0d8cc 100%);
+      --helpline-grad:linear-gradient(135deg,rgba(245,215,200,0.4) 0%,rgba(240,200,190,0.4) 100%);
+      --helpline-border:rgba(192,96,74,0.25);
+    }
+    [data-theme="midnight"] {
+      --cream:#12111a;--paper:#1a1926;--lavender:#252338;--sage:#1e2a2c;--sky:#1c2530;--blush:#281e24;--mist:#1e2030;
+      --ink:#e8e6f0;--ink-light:#a8a4c0;--ink-faint:#686080;--accent:#9d8fd8;--accent-2:#72b89e;--accent-3:#e0a080;
+      --shadow-soft:0 4px 28px rgba(0,0,0,0.4);--shadow-card:0 2px 18px rgba(0,0,0,0.35);
+      --hero-grad-1:rgba(50,44,80,0.8);--hero-grad-2:rgba(30,50,48,0.7);--hero-grad-3:rgba(28,42,58,0.6);
+      --blob-grad:linear-gradient(135deg,#2a2645 0%,#1e3040 50%,#202e28 100%);
+      --cta-grad:linear-gradient(135deg,#252338 0%,#1c2530 50%,#1e2a2c 100%);
+      --helpline-grad:linear-gradient(135deg,rgba(30,50,48,0.6) 0%,rgba(28,42,58,0.6) 100%);
+      --helpline-border:rgba(114,184,158,0.3);
+    }
+    [data-theme="midnight"] nav{background:rgba(18,17,26,0.92)!important;border-bottom-color:rgba(157,143,216,0.15)!important;}
+    [data-theme="midnight"] .trust-bar,[data-theme="midnight"] .how,[data-theme="midnight"] .cta-section{background:var(--paper);}
+    [data-theme="midnight"] footer{background:#0d0c14;}
+    [data-theme="midnight"] .mockup-phone{background:#1e1d2c;border-color:#2a2840;}
+    [data-theme="midnight"] .phone-bar{background:var(--lavender);}
+    [data-theme="midnight"] .phone-mood{background:var(--lavender);}
+    [data-theme="midnight"] .phone-mood.sel{background:#2e2a50;}
+    [data-theme="midnight"] .hero-card{background:rgba(30,28,50,0.85);}
+    [data-theme="midnight"] .mood-ring{background:rgba(30,28,50,0.8);}
+    [data-theme="midnight"] .feature-card{background:var(--paper);border-color:rgba(157,143,216,0.1);}
+    [data-theme="midnight"] .helpline{background:var(--paper);}
+    [data-theme="midnight"] .helpline-number{background:var(--lavender);border-color:rgba(114,184,158,0.25);}
+    [data-theme="midnight"] .tag{background:var(--lavender);}
+    [data-theme="midnight"] body::before{opacity:0.15;}
+    [data-theme="midnight"] .lang-btn{background:rgba(255,255,255,0.07)!important;border-color:rgba(157,143,216,0.25)!important;}
+    [data-theme="midnight"] .lang-panel{background:#1a1926;border-color:rgba(157,143,216,0.18);}
+    [data-theme="midnight"] .lang-opt:hover{background:var(--lavender);}
+    [data-theme="midnight"] .lang-opt.active{background:#2a2645;}
+
+    /* ===== THEME SWITCHER ===== */
+    .theme-switcher{position:fixed;bottom:28px;right:28px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+    .theme-toggle-btn{width:48px;height:48px;border-radius:50%;border:none;background:var(--accent);color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;transition:transform 0.25s,box-shadow 0.25s;}
+    .theme-toggle-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,0,0,0.22);}
+    .theme-toggle-btn.open{transform:rotate(45deg);}
+    .theme-panel{background:var(--cream);border:1px solid rgba(123,111,168,0.15);border-radius:var(--radius-lg);padding:18px 16px;box-shadow:0 8px 40px rgba(0,0,0,0.14);width:210px;display:none;flex-direction:column;gap:8px;animation:panelIn 0.22s ease;}
+    .theme-panel.open{display:flex;}
+    @keyframes panelIn{from{opacity:0;transform:translateY(10px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .theme-panel-title{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px;padding-left:4px;}
+    .theme-option{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;border:1.5px solid transparent;transition:all 0.2s;background:none;width:100%;text-align:left;}
+    .theme-option:hover{background:var(--lavender);}
+    .theme-option.active{border-color:var(--accent);background:var(--lavender);}
+    .theme-swatch{width:28px;height:28px;border-radius:50%;flex-shrink:0;border:2px solid rgba(0,0,0,0.06);}
+    .theme-option-label{display:flex;flex-direction:column;gap:1px;}
+    .theme-option-name{font-size:0.85rem;color:var(--ink);font-weight:500;}
+    .theme-option-desc{font-size:0.7rem;color:var(--ink-faint);}
+
+    /* ===== LANGUAGE SWITCHER ===== */
+    .lang-switcher{position:relative;display:inline-flex;align-items:center;}
+    .lang-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:50px;border:1.5px solid rgba(123,111,168,0.22);background:rgba(255,255,255,0.5);color:var(--ink);font-family:var(--font-body);font-size:0.82rem;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap;backdrop-filter:blur(4px);}
+    .lang-btn:hover{background:var(--lavender);border-color:var(--accent);}
+    .lang-btn .lbflag{font-size:1rem;line-height:1;}
+    .lang-btn .lbchev{font-size:0.58rem;color:var(--ink-faint);transition:transform 0.2s;margin-left:1px;}
+    .lang-btn.open .lbchev{transform:rotate(180deg);}
+    .lang-panel{position:absolute;top:calc(100% + 8px);right:0;min-width:195px;background:var(--cream);border:1.5px solid rgba(123,111,168,0.15);border-radius:var(--radius-md);padding:8px;box-shadow:0 8px 36px rgba(0,0,0,0.13);display:none;flex-direction:column;gap:2px;z-index:500;animation:panelIn 0.18s ease;}
+    .lang-panel.open{display:flex;}
+    .lang-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--font-body);transition:background 0.15s;}
+    .lang-opt:hover{background:var(--lavender);}
+    .lang-opt.active{background:var(--lavender);}
+    .lang-opt .loflag{font-size:1.1rem;line-height:1;}
+    .lang-opt-info{display:flex;flex-direction:column;gap:1px;}
+    .lang-opt-name{font-size:0.84rem;font-weight:500;color:var(--ink);}
+    .lang-opt-native{font-size:0.7rem;color:var(--ink-faint);}
+    .lang-opt.active .lang-opt-name::after{content:' ✓';color:var(--accent);}
+
+    /* mobile lang section */
+    .mob-lang-wrap{padding:12px 0;border-bottom:1px solid rgba(123,111,168,0.08);}
+    .mob-lang-label{font-size:0.72rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.09em;margin-bottom:10px;}
+    .mob-lang-row{display:flex;flex-wrap:wrap;gap:7px;}
+    .mob-lang-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:50px;border:1.5px solid rgba(123,111,168,0.18);background:transparent;color:var(--ink);font-size:0.78rem;cursor:pointer;font-family:var(--font-body);transition:all 0.2s;}
+    .mob-lang-chip.active{background:var(--lavender);border-color:var(--accent);color:var(--accent);}
+
+    /* smooth transitions */
+    body,nav,.trust-bar,.features,.how,.cta-section,footer,
+    .feature-card,.helpline,.hero-card,.mood-ring,.theme-panel,
+    .mockup-phone,.phone-bar,.phone-mood,.tag,.btn{transition:var(--transition-theme);}
+
+    /* ===== RESET ===== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;font-size:16px;}
+    body{font-family:var(--font-body);background:var(--cream);color:var(--ink);line-height:1.7;overflow-x:hidden;}
+    img{max-width:100%;display:block;}
+    a{color:inherit;text-decoration:none;}
+    ul{list-style:none;}
+
+    /* ===== UTILITY ===== */
+    .container{max-width:1100px;margin:0 auto;padding:0 24px;}
+    .tag{display:inline-block;font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);background:var(--lavender);border-radius:50px;padding:4px 14px;margin-bottom:16px;}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:50px;font-family:var(--font-body);font-size:0.9rem;font-weight:600;cursor:pointer;border:none;transition:all 0.25s ease;letter-spacing:0.01em;}
+    .btn-primary{background:var(--accent);color:#ffffff!important;box-shadow:0 4px 18px rgba(0,0,0,0.2);border:2px solid transparent;text-shadow:0 1px 2px rgba(0,0,0,0.15);}
+    .btn-primary:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.25);}
+    .btn-ghost{background:rgba(255,255,255,0.6);color:var(--ink)!important;border:2px solid var(--accent);font-weight:600;backdrop-filter:blur(4px);}
+    .btn-ghost:hover{background:var(--accent);color:#ffffff!important;border-color:var(--accent);}
+    .nav-cta{color:#ffffff!important;background:var(--accent);border:2px solid transparent;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
+    .nav-cta:hover{filter:brightness(1.12);color:#ffffff!important;}
+    [data-theme="midnight"] .btn-ghost{background:rgba(255,255,255,0.08);color:#e8e6f0!important;border-color:var(--accent);}
+    [data-theme="midnight"] .btn-ghost:hover{background:var(--accent);color:#ffffff!important;}
+    [data-theme="midnight"] .btn-primary{color:#ffffff!important;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+    .cta-actions .btn-ghost{background:rgba(255,255,255,0.65)!important;color:var(--ink)!important;border:2px solid rgba(0,0,0,0.15)!important;backdrop-filter:blur(6px);}
+    .cta-actions .btn-ghost:hover{background:#ffffff!important;color:var(--ink)!important;}
+    [data-theme="midnight"] .cta-actions .btn-ghost{background:rgba(255,255,255,0.1)!important;color:#e8e6f0!important;border-color:rgba(255,255,255,0.2)!important;}
+    .section-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.5rem);font-weight:500;color:var(--ink);line-height:1.3;margin-bottom:14px;}
+    .section-sub{font-size:1rem;color:var(--ink-light);max-width:520px;line-height:1.75;}
+
+    /* ===== NOISE ===== */
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+
+    /* ===== NAV ===== */
+    nav{position:sticky;top:0;z-index:100;background:rgba(250,248,245,0.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(123,111,168,0.1);padding:14px 0;transition:box-shadow 0.3s;}
+    nav.scrolled{box-shadow:var(--shadow-soft);}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;}
+    .nav-logo{font-family:var(--font-display);font-size:1.25rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:9px;}
+    .nav-logo .logo-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;display:inline-block;}
+    .nav-links{display:flex;align-items:center;gap:22px;}
+    .nav-links a{font-size:0.87rem;color:var(--ink);font-weight:500;transition:color 0.2s;opacity:0.75;}
+    .nav-links a:hover{color:var(--accent);opacity:1;}
+    .nav-cta{margin-left:6px;padding:9px 22px;font-size:0.85rem;}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:0.3s;}
+
+    /* ===== HERO ===== */
+    .hero{padding:90px 0 80px;position:relative;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 20%,var(--hero-grad-1) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 10% 80%,var(--hero-grad-2) 0%,transparent 70%),radial-gradient(ellipse 50% 60% at 50% 50%,var(--hero-grad-3) 0%,transparent 70%);transition:background 0.5s ease;}
+    .hero-inner{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+    .hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+    .hero-pulse{width:8px;height:8px;background:var(--accent-2);border-radius:50%;animation:pulse 2.5s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(90,143,123,0.5);}50%{box-shadow:0 0 0 7px rgba(90,143,123,0);}}
+    .hero-eyebrow span{font-size:0.82rem;color:var(--accent-2);font-weight:500;}
+    .hero h1{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3.4rem);font-weight:500;line-height:1.2;color:var(--ink);margin-bottom:20px;}
+    .hero h1 em{font-style:italic;color:var(--accent);}
+    .hero-sub{font-size:1.05rem;color:var(--ink-light);line-height:1.8;margin-bottom:34px;max-width:440px;}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+    .hero-note{margin-top:22px;font-size:0.78rem;color:var(--ink-faint);display:flex;align-items:center;gap:6px;}
+    .hero-note::before{content:'🔒';font-size:0.75rem;}
+    .hero-visual{display:flex;justify-content:center;align-items:center;}
+    .hero-blob{width:380px;height:380px;position:relative;}
+    .blob-bg{position:absolute;inset:0;background:var(--blob-grad);border-radius:60% 40% 55% 45%/50% 55% 45% 50%;animation:blobMorph 8s ease-in-out infinite;transition:background 0.5s ease;}
+    @keyframes blobMorph{0%,100%{border-radius:60% 40% 55% 45%/50% 55% 45% 50%;}33%{border-radius:40% 60% 45% 55%/55% 45% 55% 45%;}66%{border-radius:55% 45% 60% 40%/45% 50% 50% 55%;}}
+    .blob-float{position:absolute;inset:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+    .mood-ring{display:flex;gap:12px;background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border-radius:var(--radius-lg);padding:14px 20px;box-shadow:var(--shadow-card);}
+    .mood-emoji{font-size:1.6rem;cursor:pointer;transition:transform 0.2s;filter:grayscale(0.15);}
+    .mood-emoji:hover,.mood-emoji.active{transform:scale(1.3);filter:grayscale(0);}
+    .hero-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(10px);border-radius:var(--radius-md);padding:14px 18px;box-shadow:var(--shadow-card);font-size:0.82rem;color:var(--ink-light);display:flex;align-items:center;gap:10px;width:220px;}
+    .hero-card .icon-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .dot-purple{background:var(--lavender);}
+    .dot-green{background:var(--sage);}
+    .card-label{font-size:0.7rem;color:var(--ink-faint);}
+    .card-value{font-weight:500;color:var(--ink);font-size:0.85rem;}
+    .float-card-1{position:absolute;top:30px;right:-20px;animation:floatY 4s ease-in-out infinite;}
+    .float-card-2{position:absolute;bottom:30px;left:-20px;animation:floatY 4s ease-in-out infinite 2s;}
+    @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+    /* ===== TRUST BAR ===== */
+    .trust-bar{padding:24px 0;border-top:1px solid rgba(123,111,168,0.1);border-bottom:1px solid rgba(123,111,168,0.1);background:var(--paper);}
+    .trust-inner{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;}
+    .trust-item{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--ink-light);}
+    .trust-item .t-icon{font-size:1rem;}
+
+    /* ===== FEATURES ===== */
+    .features{padding:100px 0;}
+    .features-header{text-align:center;margin-bottom:60px;}
+    .features-header .section-sub{margin:0 auto;}
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+    .feature-card{background:var(--paper);border-radius:var(--radius-lg);padding:34px 28px;border:1px solid rgba(123,111,168,0.08);transition:all 0.3s ease;position:relative;overflow:hidden;}
+    .feature-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;border-radius:var(--radius-lg);}
+    .feature-card:nth-child(1)::before{background:linear-gradient(135deg,var(--lavender),transparent);}
+    .feature-card:nth-child(2)::before{background:linear-gradient(135deg,var(--sage),transparent);}
+    .feature-card:nth-child(3)::before{background:linear-gradient(135deg,var(--sky),transparent);}
+    .feature-card:nth-child(4)::before{background:linear-gradient(135deg,var(--blush),transparent);}
+    .feature-card:nth-child(5)::before{background:linear-gradient(135deg,var(--lavender),transparent);}
+    .feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-soft);}
+    .feature-card:hover::before{opacity:1;}
+    .feature-icon{width:50px;height:50px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:18px;position:relative;}
+    .feature-card h3{font-family:var(--font-display);font-size:1.1rem;font-weight:500;margin-bottom:10px;color:var(--ink);position:relative;}
+    .feature-card p{font-size:0.88rem;color:var(--ink-light);line-height:1.75;position:relative;}
+    .feature-card.wide{grid-column:span 2;}
+
+    /* ===== HOW IT WORKS ===== */
+    .how{padding:100px 0;background:var(--paper);}
+    .how-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+    .steps{display:flex;flex-direction:column;gap:0;}
+    .step{display:flex;gap:20px;padding:24px 0;border-left:2px solid rgba(123,111,168,0.15);padding-left:28px;position:relative;transition:0.3s;}
+    .step:first-child{padding-top:0;}
+    .step:last-child{border-left-color:transparent;}
+    .step::before{content:'';position:absolute;left:-9px;top:24px;width:16px;height:16px;border-radius:50%;background:var(--lavender);border:2px solid var(--accent);transition:0.3s;}
+    .step:first-child::before{top:0;}
+    .step:hover::before{background:var(--accent);}
+    .step-num{font-family:var(--font-display);font-size:2rem;font-weight:400;color:rgba(123,111,168,0.2);line-height:1;flex-shrink:0;width:36px;}
+    .step-content h3{font-family:var(--font-display);font-size:1.05rem;font-weight:500;color:var(--ink);margin-bottom:6px;}
+    .step-content p{font-size:0.87rem;color:var(--ink-light);line-height:1.7;}
+    .how-visual{display:flex;align-items:center;justify-content:center;}
+    .mockup-phone{width:260px;background:#fff;border-radius:36px;box-shadow:0 20px 60px rgba(100,90,130,0.18),0 4px 16px rgba(100,90,130,0.1);overflow:hidden;border:6px solid #fff;}
+    .phone-bar{height:44px;background:var(--lavender);display:flex;align-items:center;justify-content:center;gap:6px;}
+    .phone-bar span{font-size:0.72rem;color:var(--accent);font-weight:500;}
+    .phone-body{padding:20px 18px;}
+    .phone-greeting{font-size:0.75rem;color:var(--ink-faint);margin-bottom:4px;}
+    .phone-question{font-family:var(--font-display);font-size:1rem;color:var(--ink);margin-bottom:16px;}
+    .phone-moods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+    .phone-mood{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--cream);cursor:pointer;transition:0.2s;}
+    .phone-mood.sel{background:var(--lavender);transform:scale(1.1);}
+    .phone-insight{background:var(--sage);border-radius:var(--radius-sm);padding:12px;font-size:0.75rem;color:var(--ink-light);margin-bottom:12px;}
+    .phone-insight strong{color:var(--ink);display:block;margin-bottom:3px;}
+    .phone-tags{display:flex;gap:6px;flex-wrap:wrap;}
+    .phone-tag{background:var(--lavender);border-radius:50px;padding:4px 10px;font-size:0.68rem;color:var(--accent);}
+
+    /* ===== QUOTES ===== */
+    .quotes{padding:90px 0;}
+    .quotes-inner{text-align:center;max-width:680px;margin:0 auto;}
+    .quote-display{font-family:var(--font-display);font-size:clamp(1.3rem,3vw,1.9rem);font-weight:400;font-style:italic;color:var(--ink);line-height:1.55;position:relative;min-height:100px;display:flex;align-items:center;justify-content:center;}
+    .quote-display::before{content:'\201C';position:absolute;top:-20px;left:-20px;font-size:5rem;color:rgba(123,111,168,0.12);font-family:Georgia,serif;line-height:1;}
+    .quote-text{transition:opacity 0.5s,transform 0.5s;}
+    .quote-text.fade{opacity:0;transform:translateY(8px);}
+    .quote-dots{display:flex;justify-content:center;gap:8px;margin-top:28px;}
+    .quote-dot{width:6px;height:6px;border-radius:50%;background:rgba(123,111,168,0.2);cursor:pointer;transition:0.2s;}
+    .quote-dot.active{background:var(--accent);width:18px;border-radius:3px;}
+
+    /* ===== CTA ===== */
+    .cta-section{padding:90px 0;background:var(--paper);}
+    .cta-inner{background:var(--cta-grad);border-radius:var(--radius-xl);padding:70px 60px;text-align:center;position:relative;overflow:hidden;transition:background 0.5s ease;}
+    .cta-inner::before{content:'';position:absolute;width:300px;height:300px;background:rgba(255,255,255,0.2);border-radius:50%;top:-100px;right:-80px;}
+    .cta-inner::after{content:'';position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.15);border-radius:50%;bottom:-60px;left:-40px;}
+    .cta-inner h2{font-family:var(--font-display);font-size:clamp(1.7rem,4vw,2.6rem);font-weight:500;color:var(--ink);margin-bottom:14px;position:relative;}
+    .cta-inner p{font-size:1rem;color:var(--ink-light);margin-bottom:34px;position:relative;}
+    .cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;}
+
+    /* ===== HELPLINE ===== */
+    .helpline{padding:60px 0;background:#fff;}
+    .helpline-inner{border:1.5px solid var(--helpline-border);background:var(--helpline-grad);border-radius:var(--radius-lg);padding:40px 44px;display:flex;align-items:flex-start;gap:28px;transition:background 0.5s ease,border-color 0.5s ease;}
+    .helpline-icon{width:52px;height:52px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+    .helpline-text h3{font-family:var(--font-display);font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px;}
+    .helpline-text p{font-size:0.88rem;color:var(--ink-light);margin-bottom:14px;max-width:520px;}
+    .helpline-numbers{display:flex;gap:12px;flex-wrap:wrap;}
+    .helpline-number{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid rgba(90,143,123,0.3);border-radius:50px;padding:8px 16px;font-size:0.85rem;color:var(--ink);transition:0.2s;}
+    .helpline-number:hover{border-color:var(--accent-2);background:var(--sage);}
+    .helpline-number .hn-label{color:var(--ink-faint);font-size:0.75rem;}
+    .helpline-number .hn-num{font-weight:500;color:var(--accent-2);}
+
+    /* ===== FOOTER ===== */
+    footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:60px 0 30px;}
+    .footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:50px;margin-bottom:50px;}
+    .footer-brand .nav-logo{color:#fff;margin-bottom:14px;}
+    .footer-brand p{font-size:0.83rem;line-height:1.75;color:rgba(255,255,255,0.5);max-width:240px;}
+    .footer-col h4{font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+    .footer-col a{display:block;font-size:0.85rem;color:rgba(255,255,255,0.65);margin-bottom:10px;transition:color 0.2s;}
+    .footer-col a:hover{color:#fff;}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+    .footer-bottom p{font-size:0.78rem;color:rgba(255,255,255,0.35);}
+    .footer-disclaimer{font-size:0.75rem;color:rgba(255,255,255,0.3);max-width:500px;line-height:1.6;}
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:900px){
+      .nav-links{display:none;}
+      .nav-hamburger{display:flex;}
+      .hero-inner{grid-template-columns:1fr;gap:40px;}
+      .hero-visual{order:-1;}
+      .hero-blob{width:300px;height:300px;}
+      .float-card-1,.float-card-2{display:none;}
+      .features-grid{grid-template-columns:1fr 1fr;}
+      .feature-card.wide{grid-column:span 1;}
+      .how-inner{grid-template-columns:1fr;}
+      .mockup-phone{display:none;}
+      .footer-top{grid-template-columns:1fr 1fr;}
+      .helpline-inner{flex-direction:column;gap:16px;}
+    }
+    @media(max-width:600px){
+      .features-grid{grid-template-columns:1fr;}
+      .cta-inner{padding:44px 24px;}
+      .footer-top{grid-template-columns:1fr;gap:32px;}
+      .trust-inner{gap:20px;}
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease;}
+    .fade-up.visible{opacity:1;transform:translateY(0);}
+
+    /* mobile nav */
+    .mobile-nav{display:none;flex-direction:column;gap:0;background:var(--cream);border-top:1px solid rgba(123,111,168,0.1);padding:16px 24px;}
+    .mobile-nav.open{display:flex;}
+    .mobile-nav a{padding:12px 0;font-size:0.95rem;color:var(--ink);font-weight:500;border-bottom:1px solid rgba(123,111,168,0.07);opacity:0.85;}
+    .mobile-nav a:last-of-type{border-bottom:none;}
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo" aria-label="MindMate home">
+        <span class="logo-dot" aria-hidden="true"></span>
+        MindMate
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#features" data-i18n="nav.features">Features</a></li>
+        <li><a href="#how" data-i18n="nav.how">How It Works</a></li>
+        <li><a href="#about" data-i18n="nav.about">About</a></li>
+        <li><a href="#helpline" data-i18n="nav.resources">Resources</a></li>
+        <!-- LANGUAGE SWITCHER (desktop) -->
+        <li>
+          <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
+              <span class="lbflag" id="langFlag">🇬🇧</span>
+              <span id="langLabel">English</span>
+              <span class="lbchev">▼</span>
+            </button>
+            <div class="lang-panel" id="langPanel" role="listbox"></div>
+          </div>
+        </li>
+        <li><a href="#" class="btn btn-primary nav-cta" data-i18n="nav.signup">Sign Up Free</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#how" data-i18n="nav.how">How It Works</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#helpline" data-i18n="nav.resources">Resources</a>
+      <a href="#" data-i18n="nav.login">Login</a>
+      <a href="#" style="color:var(--accent);font-weight:500;" data-i18n="nav.signup">Sign Up Free</a>
+      <!-- LANGUAGE SWITCHER (mobile) -->
+      <div class="mob-lang-wrap">
+        <div class="mob-lang-label">Language / भाषा / மொழி</div>
+        <div class="mob-lang-row" id="mobLangRow"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">
+          <div class="hero-pulse" aria-hidden="true"></div>
+          <span data-i18n="hero.eyebrow">Your quiet corner on campus</span>
+        </div>
+        <h1 id="hero-heading">
+          <span data-i18n="hero.h1a">A gentle space</span><br/>
+          <span data-i18n="hero.h1b">for your </span><em data-i18n="hero.h1em">mind</em><span data-i18n="hero.h1c"> to rest.</span>
+        </h1>
+        <p class="hero-sub" data-i18n="hero.sub">MindMate helps students check in with themselves daily — tracking mood, journaling thoughts, and offering AI-guided support to navigate stress, burnout, and the weight of student life.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-primary" data-i18n="hero.cta1">✦ Begin Check-In</a>
+          <a href="#how" class="btn btn-ghost" data-i18n="hero.cta2">See How It Works</a>
+        </div>
+        <p class="hero-note" data-i18n="hero.note">Always anonymous. Never judgmental. Always here.</p>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-blob">
+          <div class="blob-bg"></div>
+          <div class="blob-float">
+            <div class="mood-ring">
+              <span class="mood-emoji active">😊</span>
+              <span class="mood-emoji">😌</span>
+              <span class="mood-emoji">😔</span>
+              <span class="mood-emoji">😰</span>
+              <span class="mood-emoji">😤</span>
+            </div>
+          </div>
+          <div class="hero-card float-card-1">
+            <div class="icon-dot dot-purple">💡</div>
+            <div>
+              <div class="card-label" data-i18n="card.aiLabel">AI Insight</div>
+              <div class="card-value" data-i18n="card.aiVal">You seem tired lately</div>
+            </div>
+          </div>
+          <div class="hero-card float-card-2">
+            <div class="icon-dot dot-green">📈</div>
+            <div>
+              <div class="card-label" data-i18n="card.weekLabel">This Week</div>
+              <div class="card-value" data-i18n="card.weekVal">Mood improved +18%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="container trust-inner">
+      <div class="trust-item"><span class="t-icon">🔒</span><span data-i18n="trust.anon">100% Anonymous</span></div>
+      <div class="trust-item"><span class="t-icon">🤖</span><span data-i18n="trust.ai">Powered by Gemini AI</span></div>
+      <div class="trust-item"><span class="t-icon">🌿</span><span data-i18n="trust.nojudge">Judgment-Free Zone</span></div>
+      <div class="trust-item"><span class="t-icon">📊</span><span data-i18n="trust.reports">Weekly Wellness Reports</span></div>
+      <div class="trust-item"><span class="t-icon">💙</span><span data-i18n="trust.students">Built for Students</span></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features" aria-labelledby="features-heading">
+    <div class="container">
+      <div class="features-header fade-up">
+        <div class="tag" data-i18n="features.tag">What We Offer</div>
+        <h2 class="section-title" id="features-heading" data-i18n="features.title">Everything you need to feel a little better</h2>
+        <p class="section-sub" data-i18n="features.sub">Small, gentle tools designed to support your mental wellness — one check-in at a time.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:var(--lavender);">😊</div>
+          <h3 data-i18n="f1.title">Mood Check-Ins</h3>
+          <p data-i18n="f1.desc">A simple emoji-based daily check-in. No pressure, no lengthy forms — just a moment to acknowledge how you're feeling today.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:var(--sky);">🤖</div>
+          <h3 data-i18n="f2.title">AI-Powered Insights</h3>
+          <p data-i18n="f2.desc">Gemini AI gently analyzes your patterns over time — spotting signs of stress, burnout, or anxiety before they overwhelm you.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:var(--sage);">🌿</div>
+          <h3 data-i18n="f3.title">Personalized Coping</h3>
+          <p data-i18n="f3.desc">Get tailored suggestions — breathing exercises, calming music, study break reminders, or a gentle walk nudge — based on your mood.</p>
+        </div>
+        <div class="feature-card fade-up wide">
+          <div class="feature-icon" style="background:var(--blush);">📓</div>
+          <h3 data-i18n="f4.title">Optional Journaling</h3>
+          <p data-i18n="f4.desc">A private, judgment-free space to write down your thoughts. Your words stay yours — encrypted, private, and never shared. Sometimes putting it into words is all you need.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:var(--lavender);">📈</div>
+          <h3 data-i18n="f5.title">Weekly Wellness Trends</h3>
+          <p data-i18n="f5.desc">Beautiful, simple graphs showing your emotional journey across the week — so you can see your own progress and patterns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how" aria-labelledby="how-heading">
+    <div class="container how-inner">
+      <div>
+        <div class="tag" data-i18n="how.tag">Simple Process</div>
+        <h2 class="section-title" id="how-heading"><span data-i18n="how.title1">Four small steps.</span><br/><span data-i18n="how.title2">A meaningful difference.</span></h2>
+        <p class="section-sub" style="margin-bottom:40px;" data-i18n="how.sub">No complicated setup. No overwhelming forms. Just a gentle routine that fits into your day.</p>
+        <div class="steps">
+          <div class="step fade-up"><div class="step-num">01</div><div class="step-content"><h3 data-i18n="step1.title">Daily Check-In</h3><p data-i18n="step1.desc">Tap an emoji that matches how you're feeling. Takes under 30 seconds — no overthinking needed.</p></div></div>
+          <div class="step fade-up"><div class="step-num">02</div><div class="step-content"><h3 data-i18n="step2.title">Journal (Optional)</h3><p data-i18n="step2.desc">Write a few words about your day if you'd like. Totally optional, completely private.</p></div></div>
+          <div class="step fade-up"><div class="step-num">03</div><div class="step-content"><h3 data-i18n="step3.title">AI Reads the Pattern</h3><p data-i18n="step3.desc">Gemini AI quietly notices trends across your check-ins — gently flagging stress patterns you might not notice yourself.</p></div></div>
+          <div class="step fade-up"><div class="step-num">04</div><div class="step-content"><h3 data-i18n="step4.title">Get Gentle Suggestions</h3><p data-i18n="step4.desc">Receive personalised coping recommendations — small, doable actions that actually help.</p></div></div>
+        </div>
+      </div>
+      <div class="how-visual" aria-hidden="true">
+        <div class="mockup-phone">
+          <div class="phone-bar"><span>🌿 MindMate</span></div>
+          <div class="phone-body">
+            <div class="phone-greeting" data-i18n="phone.greeting">Good evening, Arjun 👋</div>
+            <div class="phone-question" data-i18n="phone.question">How are you feeling today?</div>
+            <div class="phone-moods">
+              <div class="phone-mood">😊</div><div class="phone-mood sel">😔</div>
+              <div class="phone-mood">😌</div><div class="phone-mood">😰</div><div class="phone-mood">😤</div>
+            </div>
+            <div class="phone-insight">
+              <strong data-i18n="phone.insightTitle">💡 AI Notice</strong>
+              <span data-i18n="phone.insightBody">You've checked in as tired 4 days this week. Might be a good time to rest.</span>
+            </div>
+            <div class="phone-tags">
+              <span class="phone-tag" data-i18n="phone.tag1">🎵 Calm Music</span>
+              <span class="phone-tag" data-i18n="phone.tag2">🚶 5-min Walk</span>
+              <span class="phone-tag" data-i18n="phone.tag3">🌬 Breathe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTES -->
+  <section class="quotes">
+    <div class="container quotes-inner">
+      <div class="tag" data-i18n="quotes.tag">A reminder for you</div>
+      <div class="quote-display">
+        <p class="quote-text" id="quoteText">You don't have to carry everything alone.</p>
+      </div>
+      <div class="quote-dots" id="quoteDots"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="about" aria-labelledby="cta-heading">
+    <div class="container">
+      <div class="cta-inner fade-up">
+        <h2 id="cta-heading" data-i18n="cta.title">Take a moment for yourself today.</h2>
+        <p data-i18n="cta.sub">It's okay to not be okay. MindMate is here whenever you need it — quietly, gently, always.</p>
+        <div class="cta-actions">
+          <a href="#" class="btn btn-primary" data-i18n="cta.btn1">✦ Begin Now</a>
+          <a href="#" class="btn btn-ghost" data-i18n="cta.btn2">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HELPLINE -->
+  <section class="helpline" id="helpline" aria-labelledby="helpline-heading">
+    <div class="container">
+      <div class="helpline-inner">
+        <div class="helpline-icon">💚</div>
+        <div class="helpline-text">
+          <h3 id="helpline-heading" data-i18n="helpline.title">You are not alone — help is always available</h3>
+          <p data-i18n="helpline.sub">If you're feeling overwhelmed, in distress, or having thoughts of self-harm, please reach out to a professional. Talking to someone is a sign of strength, not weakness.</p>
+          <div class="helpline-numbers">
+            <a href="tel:+919820466627" class="helpline-number"><span class="hn-label">AASRA</span><span class="hn-num">+91-9820466627</span></a>
+            <a href="tel:9152987821" class="helpline-number"><span class="hn-label">iCall</span><span class="hn-num">9152987821</span></a>
+            <a href="tel:18602662345" class="helpline-number"><span class="hn-label">Vandrevala Foundation</span><span class="hn-num">1860-2662-345</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="nav-logo"><span class="logo-dot" style="background:var(--lavender);"></span>MindMate</div>
+          <p data-i18n="footer.tagline">A gentle wellness companion for students. Built with care, designed with empathy.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.product">Product</h4>
+          <a href="#features" data-i18n="nav.features">Features</a>
+          <a href="#how" data-i18n="nav.how">How It Works</a>
+          <a href="#" data-i18n="footer.pricing">Pricing</a>
+          <a href="#" data-i18n="footer.changelog">Changelog</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.company">Company</h4>
+          <a href="#" data-i18n="footer.about">About Us</a>
+          <a href="#" data-i18n="footer.blog">Blog</a>
+          <a href="#" data-i18n="footer.careers">Careers</a>
+          <a href="#" data-i18n="footer.contact">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.legal">Legal</h4>
+          <a href="#" data-i18n="footer.privacy">Privacy Policy</a>
+          <a href="#" data-i18n="footer.terms">Terms of Use</a>
+          <a href="#" data-i18n="footer.security">Data Security</a>
+          <a href="#helpline" data-i18n="footer.crisis">Crisis Resources</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p data-i18n="footer.copy">© 2026 MindMate. Made with 💙 for students.</p>
+        <p class="footer-disclaimer" data-i18n="footer.disclaimer">MindMate is not a substitute for professional mental health care. If you are in crisis, please contact a licensed mental health professional or emergency services.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- THEME SWITCHER -->
+  <div class="theme-switcher">
+    <div class="theme-panel" id="themePanel">
+      <div class="theme-panel-title">Choose your vibe</div>
+      <button class="theme-option" data-theme="default" onclick="setTheme('default',this)">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#e8e4f3,#dde8e2);"></span>
+        <span class="theme-option-label"><span class="theme-option-name">Lavender Dusk</span><span class="theme-option-desc">Soft purple & sage</span></span>
+      </button>
+      <button class="theme-option" data-theme="ocean" onclick="setTheme('ocean',this)">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#cce8f0,#d4eae8);"></span>
+        <span class="theme-option-label"><span class="theme-option-name">Ocean Mist</span><span class="theme-option-desc">Calm teal & blue</span></span>
+      </button>
+      <button class="theme-option" data-theme="forest" onclick="setTheme('forest',this)">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#d4e8d0,#c8e0c4);"></span>
+        <span class="theme-option-label"><span class="theme-option-name">Forest Calm</span><span class="theme-option-desc">Earthy greens</span></span>
+      </button>
+      <button class="theme-option" data-theme="sunset" onclick="setTheme('sunset',this)">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#f5ddd6,#fce0d4);"></span>
+        <span class="theme-option-label"><span class="theme-option-name">Sunset Rose</span><span class="theme-option-desc">Warm blush & peach</span></span>
+      </button>
+      <button class="theme-option active" data-theme="midnight" onclick="setTheme('midnight',this)">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#252338,#1e2a2c);"></span>
+        <span class="theme-option-label"><span class="theme-option-name">Midnight Ink ✓</span><span class="theme-option-desc">Dark & restful</span></span>
+      </button>
+    </div>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme panel" aria-expanded="false">🎨</button>
+  </div>
+
+<script>
+// ================================================================
+// TRANSLATIONS
+// ================================================================
+const LANGS = [
+  { code:'en', name:'English',  native:'English', flag:'🇬🇧' },
+  { code:'hi', name:'Hindi',    native:'हिन्दी',   flag:'🇮🇳' },
+  { code:'ta', name:'Tamil',    native:'தமிழ்',    flag:'🏳️' },
+  { code:'bn', name:'Bengali',  native:'বাংলা',    flag:'🏳️' },
+  { code:'te', name:'Telugu',   native:'తెలుగు',   flag:'🏳️' },
+  { code:'mr', name:'Marathi',  native:'मराठी',    flag:'🏳️' },
+];
+
+const T = {
+  en:{
+    'nav.features':'Features','nav.how':'How It Works','nav.about':'About',
+    'nav.resources':'Resources','nav.signup':'Sign Up Free','nav.login':'Login',
+    'hero.eyebrow':'Your quiet corner on campus',
+    'hero.h1a':'A gentle space','hero.h1b':'for your ','hero.h1em':'mind','hero.h1c':' to rest.',
+    'hero.sub':'MindMate helps students check in with themselves daily — tracking mood, journaling thoughts, and offering AI-guided support to navigate stress, burnout, and the weight of student life.',
+    'hero.cta1':'✦ Begin Check-In','hero.cta2':'See How It Works',
+    'hero.note':'Always anonymous. Never judgmental. Always here.',
+    'card.aiLabel':'AI Insight','card.aiVal':'You seem tired lately',
+    'card.weekLabel':'This Week','card.weekVal':'Mood improved +18%',
+    'trust.anon':'100% Anonymous','trust.ai':'Powered by Gemini AI',
+    'trust.nojudge':'Judgment-Free Zone','trust.reports':'Weekly Wellness Reports','trust.students':'Built for Students',
+    'features.tag':'What We Offer','features.title':'Everything you need to feel a little better',
+    'features.sub':'Small, gentle tools designed to support your mental wellness — one check-in at a time.',
+    'f1.title':'Mood Check-Ins','f1.desc':'A simple emoji-based daily check-in. No pressure, no lengthy forms — just a moment to acknowledge how you\'re feeling today.',
+    'f2.title':'AI-Powered Insights','f2.desc':'Gemini AI gently analyzes your patterns over time — spotting signs of stress, burnout, or anxiety before they overwhelm you.',
+    'f3.title':'Personalized Coping','f3.desc':'Get tailored suggestions — breathing exercises, calming music, study break reminders, or a gentle walk nudge — based on your mood.',
+    'f4.title':'Optional Journaling','f4.desc':'A private, judgment-free space to write down your thoughts. Your words stay yours — encrypted, private, and never shared.',
+    'f5.title':'Weekly Wellness Trends','f5.desc':'Beautiful, simple graphs showing your emotional journey across the week — so you can see your own progress and patterns.',
+    'how.tag':'Simple Process','how.title1':'Four small steps.','how.title2':'A meaningful difference.',
+    'how.sub':'No complicated setup. No overwhelming forms. Just a gentle routine that fits into your day.',
+    'step1.title':'Daily Check-In','step1.desc':'Tap an emoji that matches how you\'re feeling. Takes under 30 seconds — no overthinking needed.',
+    'step2.title':'Journal (Optional)','step2.desc':'Write a few words about your day if you\'d like. Totally optional, completely private.',
+    'step3.title':'AI Reads the Pattern','step3.desc':'Gemini AI quietly notices trends across your check-ins — gently flagging stress patterns you might not notice yourself.',
+    'step4.title':'Get Gentle Suggestions','step4.desc':'Receive personalised coping recommendations — small, doable actions that actually help.',
+    'phone.greeting':'Good evening, Arjun 👋','phone.question':'How are you feeling today?',
+    'phone.insightTitle':'💡 AI Notice','phone.insightBody':'You\'ve checked in as tired 4 days this week. Might be a good time to rest.',
+    'phone.tag1':'🎵 Calm Music','phone.tag2':'🚶 5-min Walk','phone.tag3':'🌬 Breathe',
+    'quotes.tag':'A reminder for you',
+    'cta.title':'Take a moment for yourself today.','cta.sub':'It\'s okay to not be okay. MindMate is here whenever you need it — quietly, gently, always.',
+    'cta.btn1':'✦ Begin Now','cta.btn2':'Learn More',
+    'helpline.title':'You are not alone — help is always available',
+    'helpline.sub':'If you\'re feeling overwhelmed, in distress, or having thoughts of self-harm, please reach out to a professional. Talking to someone is a sign of strength, not weakness.',
+    'footer.tagline':'A gentle wellness companion for students. Built with care, designed with empathy.',
+    'footer.product':'Product','footer.company':'Company','footer.legal':'Legal',
+    'footer.pricing':'Pricing','footer.changelog':'Changelog','footer.about':'About Us',
+    'footer.blog':'Blog','footer.careers':'Careers','footer.contact':'Contact',
+    'footer.privacy':'Privacy Policy','footer.terms':'Terms of Use','footer.security':'Data Security','footer.crisis':'Crisis Resources',
+    'footer.copy':'© 2026 MindMate. Made with 💙 for students.',
+    'footer.disclaimer':'MindMate is not a substitute for professional mental health care. If you are in crisis, please contact a licensed mental health professional or emergency services.',
+    quotes:["You don't have to carry everything alone.","Rest is productive.","Small steps still move you forward.","It's okay to not be okay.","You are doing better than you think.","One breath at a time is enough."],
+  },
+  hi:{
+    'nav.features':'विशेषताएं','nav.how':'यह कैसे काम करता है','nav.about':'हमारे बारे में',
+    'nav.resources':'संसाधन','nav.signup':'मुफ़्त साइन अप करें','nav.login':'लॉगिन',
+    'hero.eyebrow':'कैम्पस पर आपका शांत कोना',
+    'hero.h1a':'एक कोमल जगह','hero.h1b':'आपके ','hero.h1em':'मन','hero.h1c':' के लिए।',
+    'hero.sub':'MindMate छात्रों को रोज़ खुद से जुड़ने में मदद करता है — मूड ट्रैक करना, विचार लिखना, और AI-मार्गदर्शन।',
+    'hero.cta1':'✦ चेक-इन शुरू करें','hero.cta2':'जानें कैसे काम करता है',
+    'hero.note':'हमेशा गुमनाम। कभी नहीं आंका जाएगा। हमेशा यहाँ।',
+    'card.aiLabel':'AI अंतर्दृष्टि','card.aiVal':'आप हाल ही में थके हुए लग रहे हैं',
+    'card.weekLabel':'इस सप्ताह','card.weekVal':'मूड में +18% सुधार',
+    'trust.anon':'100% गुमनाम','trust.ai':'Gemini AI द्वारा संचालित',
+    'trust.nojudge':'बिना आलोचना का क्षेत्र','trust.reports':'साप्ताहिक वेलनेस रिपोर्ट','trust.students':'छात्रों के लिए बनाया गया',
+    'features.tag':'हम क्या प्रदान करते हैं','features.title':'थोड़ा बेहतर महसूस करने के लिए सब कुछ',
+    'features.sub':'आपकी मानसिक भलाई का समर्थन करने के लिए छोटे, कोमल उपकरण।',
+    'f1.title':'मूड चेक-इन','f1.desc':'एक सरल इमोजी-आधारित दैनिक चेक-इन। कोई दबाव नहीं।',
+    'f2.title':'AI-संचालित अंतर्दृष्टि','f2.desc':'Gemini AI आपके पैटर्न का विश्लेषण करता है।',
+    'f3.title':'व्यक्तिगत मुकाबला','f3.desc':'सांस लेने के व्यायाम, शांत संगीत, ब्रेक की याद दिलाना।',
+    'f4.title':'वैकल्पिक जर्नलिंग','f4.desc':'अपने विचार लिखने के लिए एक निजी, सुरक्षित जगह।',
+    'f5.title':'साप्ताहिक वेलनेस ट्रेंड','f5.desc':'सरल ग्राफ जो आपकी भावनात्मक यात्रा दिखाते हैं।',
+    'how.tag':'सरल प्रक्रिया','how.title1':'चार छोटे कदम।','how.title2':'एक सार्थक अंतर।',
+    'how.sub':'कोई जटिल सेटअप नहीं। बस एक सौम्य दिनचर्या।',
+    'step1.title':'दैनिक चेक-इन','step1.desc':'एक इमोजी टैप करें। 30 सेकंड से कम।',
+    'step2.title':'जर्नल (वैकल्पिक)','step2.desc':'कुछ शब्द लिखें। पूरी तरह निजी।',
+    'step3.title':'AI पैटर्न पढ़ता है','step3.desc':'Gemini AI चुपचाप रुझान नोटिस करता है।',
+    'step4.title':'कोमल सुझाव पाएं','step4.desc':'व्यक्तिगत सुझाव — छोटे, व्यावहारिक कदम।',
+    'phone.greeting':'शुभ संध्या, अर्जुन 👋','phone.question':'आज आप कैसा महसूस कर रहे हैं?',
+    'phone.insightTitle':'💡 AI नोटिस','phone.insightBody':'इस सप्ताह आपने 4 दिन थकान चेक-इन की।',
+    'phone.tag1':'🎵 शांत संगीत','phone.tag2':'🚶 5 मिनट चलें','phone.tag3':'🌬 सांस लें',
+    'quotes.tag':'आपके लिए एक याद',
+    'cta.title':'आज अपने लिए एक पल निकालें।','cta.sub':'ठीक न होना ठीक है। MindMate हमेशा यहाँ है।',
+    'cta.btn1':'✦ अभी शुरू करें','cta.btn2':'और जानें',
+    'helpline.title':'आप अकेले नहीं हैं — मदद हमेशा उपलब्ध है',
+    'helpline.sub':'अगर आप अभिभूत महसूस कर रहे हैं, कृपया किसी पेशेवर से संपर्क करें।',
+    'footer.tagline':'छात्रों के लिए एक कोमल वेलनेस साथी।',
+    'footer.product':'उत्पाद','footer.company':'कंपनी','footer.legal':'कानूनी',
+    'footer.pricing':'मूल्य निर्धारण','footer.changelog':'चेंजलॉग','footer.about':'हमारे बारे में',
+    'footer.blog':'ब्लॉग','footer.careers':'करियर','footer.contact':'संपर्क',
+    'footer.privacy':'गोपनीयता नीति','footer.terms':'उपयोग की शर्तें','footer.security':'डेटा सुरक्षा','footer.crisis':'संकट संसाधन',
+    'footer.copy':'© 2026 MindMate. छात्रों के लिए 💙 से बनाया गया।',
+    'footer.disclaimer':'MindMate पेशेवर मानसिक स्वास्थ्य देखभाल का विकल्प नहीं है।',
+    quotes:["आपको सब कुछ अकेले नहीं उठाना है।","आराम करना उत्पादक है।","छोटे कदम भी आगे ले जाते हैं।","ठीक न होना ठीक है।","आप जितना सोचते हैं उससे बेहतर कर रहे हैं।","एक सांस एक बार में काफी है।"],
+  },
+  ta:{
+    'nav.features':'அம்சங்கள்','nav.how':'எப்படி செயல்படுகிறது','nav.about':'எங்களை பற்றி',
+    'nav.resources':'வளங்கள்','nav.signup':'இலவசமாக பதிவு செய்','nav.login':'உள்நுழை',
+    'hero.eyebrow':'வளாகத்தில் உங்கள் அமைதியான மூலை',
+    'hero.h1a':'ஒரு மென்மையான இடம்','hero.h1b':'உங்கள் ','hero.h1em':'மனம்','hero.h1c':' ஓய்வெடுக்க.',
+    'hero.sub':'MindMate மாணவர்களுக்கு தினமும் தங்களோடு சரிபார்க்க உதவுகிறது — மனநிலை கண்காணிப்பு, AI வழிகாட்டல்.',
+    'hero.cta1':'✦ சரிபார்ப்பு தொடங்கு','hero.cta2':'எப்படி பார்',
+    'hero.note':'எப்போதும் அநாமதேயம். எப்போதும் இங்கே.',
+    'card.aiLabel':'AI நுண்ணறிவு','card.aiVal':'நீங்கள் சோர்வாக தெரிகிறீர்கள்',
+    'card.weekLabel':'இந்த வாரம்','card.weekVal':'மனநிலை +18% மேம்பட்டது',
+    'trust.anon':'100% அநாமதேயம்','trust.ai':'Gemini AI ஆல் இயக்கப்படுகிறது',
+    'trust.nojudge':'தீர்ப்பு இல்லாத மண்டலம்','trust.reports':'வாராந்திர நல அறிக்கைகள்','trust.students':'மாணவர்களுக்காக',
+    'features.tag':'நாங்கள் என்ன வழங்குகிறோம்','features.title':'சற்று நல்லாக உணர தேவையான அனைத்தும்',
+    'features.sub':'உங்கள் மன ஆரோக்கியத்தை ஆதரிக்க சிறிய, மென்மையான கருவிகள்.',
+    'f1.title':'மனநிலை சரிபார்ப்பு','f1.desc':'ஒரு எளிய emoji அடிப்படையிலான தினசரி சரிபார்ப்பு.',
+    'f2.title':'AI-இயக்கப்பட்ட நுண்ணறிவு','f2.desc':'Gemini AI உங்கள் வடிவங்களை பகுப்பாய்வு செய்கிறது.',
+    'f3.title':'தனிப்பட்ட சமாளிப்பு','f3.desc':'சுவாச பயிற்சிகள், அமைதியான இசை, நடை நினைவூட்டல்கள்.',
+    'f4.title':'விருப்பமான ஜர்னலிங்','f4.desc':'உங்கள் எண்ணங்களை எழுத தனிப்பட்ட, பாதுகாப்பான இடம்.',
+    'f5.title':'வாராந்திர வெல்னெஸ் போக்குகள்','f5.desc':'உங்கள் உணர்வு பயணத்தை காட்டும் எளிய வரைபடங்கள்.',
+    'how.tag':'எளிய செயல்முறை','how.title1':'நான்கு சிறிய படிகள்.','how.title2':'அர்த்தமுள்ள மாற்றம்.',
+    'how.sub':'சிக்கலான அமைவு இல்லை. உங்கள் நாளில் பொருந்தும் வழக்கம்.',
+    'step1.title':'தினசரி சரிபார்ப்பு','step1.desc':'ஒரு emoji தட்டவும். 30 வினாடிகளுக்கும் குறைவாக.',
+    'step2.title':'ஜர்னல் (விருப்பமானது)','step2.desc':'சில வார்த்தைகள் எழுதுங்கள். முற்றிலும் தனிப்பட்டது.',
+    'step3.title':'AI வடிவத்தை படிக்கிறது','step3.desc':'Gemini AI அமைதியாக போக்குகளை கவனிக்கிறது.',
+    'step4.title':'மென்மையான பரிந்துரைகள்','step4.desc':'தனிப்பட்ட சமாளிப்பு பரிந்துரைகள்.',
+    'phone.greeting':'மாலை வணக்கம், அர்ஜுன் 👋','phone.question':'இன்று நீங்கள் எப்படி உணர்கிறீர்கள்?',
+    'phone.insightTitle':'💡 AI குறிப்பு','phone.insightBody':'இந்த வாரம் 4 நாட்கள் சோர்வாக சரிபார்த்தீர்கள்.',
+    'phone.tag1':'🎵 அமைதி இசை','phone.tag2':'🚶 5-நிமிட நடை','phone.tag3':'🌬 சுவாசியுங்கள்',
+    'quotes.tag':'உங்களுக்கான நினைவூட்டல்',
+    'cta.title':'இன்று உங்களுக்காக ஒரு நிமிடம்.','cta.sub':'சரியாக இல்லாமல் இருப்பது சரி. MindMate எப்போதும் இங்கே.',
+    'cta.btn1':'✦ இப்போது தொடங்கு','cta.btn2':'மேலும் அறிக',
+    'helpline.title':'நீங்கள் தனியாக இல்லை — உதவி கிடைக்கும்',
+    'helpline.sub':'நீங்கள் மூழ்கியதாக உணர்ந்தால், ஒரு நிபுணரை தொடர்பு கொள்ளுங்கள்.',
+    'footer.tagline':'மாணவர்களுக்கான மென்மையான நல தோழர்.',
+    'footer.product':'தயாரிப்பு','footer.company':'நிறுவனம்','footer.legal':'சட்டம்',
+    'footer.pricing':'விலை','footer.changelog':'மாற்றப்பதிவு','footer.about':'எங்களை பற்றி',
+    'footer.blog':'வலைப்பதிவு','footer.careers':'வேலைவாய்ப்பு','footer.contact':'தொடர்பு',
+    'footer.privacy':'தனியுரிமை','footer.terms':'விதிமுறைகள்','footer.security':'பாதுகாப்பு','footer.crisis':'நெருக்கடி வளங்கள்',
+    'footer.copy':'© 2026 MindMate. மாணவர்களுக்காக 💙.',
+    'footer.disclaimer':'MindMate தொழில்முறை மனநல பராமரிப்புக்கு மாற்றாக இல்லை.',
+    quotes:["நீங்கள் அனைத்தையும் தனியாக சுமக்க வேண்டியதில்லை.","ஓய்வெடுப்பது உற்பத்தியானது.","சிறிய படிகளும் முன்னோக்கி அழைத்துச் செல்கின்றன.","சரியாக இல்லாமல் இருப்பது சரி.","நீங்கள் நினைப்பதை விட சிறப்பாக செய்கிறீர்கள்.","ஒரு சுவாசம் ஒரு நேரத்தில் போதும்."],
+  },
+  bn:{
+    'nav.features':'বৈশিষ্ট্য','nav.how':'কীভাবে কাজ করে','nav.about':'আমাদের সম্পর্কে',
+    'nav.resources':'সম্পদ','nav.signup':'বিনামূল্যে সাইন আপ','nav.login':'লগইন',
+    'hero.eyebrow':'ক্যাম্পাসে আপনার শান্ত কোণ',
+    'hero.h1a':'একটি কোমল জায়গা','hero.h1b':'আপনার ','hero.h1em':'মন','hero.h1c':" বিশ্রামের জন্য।",
+    'hero.sub':'MindMate শিক্ষার্থীদের প্রতিদিন নিজেদের সাথে চেক ইন করতে সাহায্য করে।',
+    'hero.cta1':'✦ চেক-ইন শুরু করুন','hero.cta2':'কীভাবে কাজ করে দেখুন',
+    'hero.note':'সবসময় বেনামী। কখনো বিচার নয়। সবসময় এখানে।',
+    'card.aiLabel':'AI অন্তর্দৃষ্টি','card.aiVal':'আপনি সম্প্রতি ক্লান্ত মনে হচ্ছেন',
+    'card.weekLabel':'এই সপ্তাহ','card.weekVal':'মেজাজ +১৮% উন্নত',
+    'trust.anon':'১০০% বেনামী','trust.ai':'Gemini AI দ্বারা চালিত',
+    'trust.nojudge':'বিচারমুক্ত অঞ্চল','trust.reports':'সাপ্তাহিক সুস্থতা রিপোর্ট','trust.students':'শিক্ষার্থীদের জন্য',
+    'features.tag':'আমরা কী অফার করি','features.title':'একটু ভালো অনুভব করতে সব কিছু',
+    'features.sub':'আপনার মানসিক সুস্থতা সমর্থন করার জন্য ছোট সরঞ্জাম।',
+    'f1.title':'মেজাজ চেক-ইন','f1.desc':'একটি সহজ ইমোজি-ভিত্তিক দৈনিক চেক-ইন।',
+    'f2.title':'AI-চালিত অন্তর্দৃষ্টি','f2.desc':'Gemini AI আপনার প্যাটার্ন বিশ্লেষণ করে।',
+    'f3.title':'ব্যক্তিগতকৃত মোকাবেলা','f3.desc':'শ্বাস-প্রশ্বাসের ব্যায়াম, শান্ত সংগীত, বিরতির অনুস্মারক।',
+    'f4.title':'ঐচ্ছিক জার্নালিং','f4.desc':'আপনার চিন্তা লেখার জন্য একটি ব্যক্তিগত জায়গা।',
+    'f5.title':'সাপ্তাহিক ট্রেন্ড','f5.desc':'আপনার আবেগীয় যাত্রা দেখানো সহজ গ্রাফ।',
+    'how.tag':'সহজ প্রক্রিয়া','how.title1':'চারটি ছোট পদক্ষেপ।','how.title2':'একটি অর্থবহ পার্থক্য।',
+    'how.sub':'কোনো জটিল সেটআপ নেই। আপনার দিনে মানানসই রুটিন।',
+    'step1.title':'দৈনিক চেক-ইন','step1.desc':'একটি ইমোজি ট্যাপ করুন। ৩০ সেকেন্ডের কম।',
+    'step2.title':'জার্নাল (ঐচ্ছিক)','step2.desc':'কয়েকটি শব্দ লিখুন। সম্পূর্ণ ব্যক্তিগত।',
+    'step3.title':'AI প্যাটার্ন পড়ে','step3.desc':'Gemini AI চুপচাপ ট্রেন্ড লক্ষ্য করে।',
+    'step4.title':'কোমল পরামর্শ পান','step4.desc':'ব্যক্তিগতকৃত মোকাবেলার সুপারিশ।',
+    'phone.greeting':'শুভ সন্ধ্যা, অর্জুন 👋','phone.question':'আজ আপনার কেমন লাগছে?',
+    'phone.insightTitle':'💡 AI নোটিশ','phone.insightBody':'এই সপ্তাহে ৪ দিন ক্লান্ত চেক ইন করেছেন।',
+    'phone.tag1':'🎵 শান্ত সংগীত','phone.tag2':'🚶 ৫ মিনিট হাঁটুন','phone.tag3':'🌬 শ্বাস নিন',
+    'quotes.tag':'আপনার জন্য স্মারক',
+    'cta.title':'আজ নিজের জন্য একটি মুহূর্ত নিন।','cta.sub':'ঠিক না থাকা ঠিক আছে। MindMate সবসময় এখানে।',
+    'cta.btn1':'✦ এখন শুরু করুন','cta.btn2':'আরো জানুন',
+    'helpline.title':'আপনি একা নন — সাহায্য পাওয়া যায়',
+    'helpline.sub':'অভিভূত বোধ করলে একজন পেশাদারের সাথে যোগাযোগ করুন।',
+    'footer.tagline':'শিক্ষার্থীদের জন্য কোমল সুস্থতার সঙ্গী।',
+    'footer.product':'পণ্য','footer.company':'কোম্পানি','footer.legal':'আইনি',
+    'footer.pricing':'মূল্য','footer.changelog':'পরিবর্তনলগ','footer.about':'আমাদের সম্পর্কে',
+    'footer.blog':'ব্লগ','footer.careers':'ক্যারিয়ার','footer.contact':'যোগাযোগ',
+    'footer.privacy':'গোপনীয়তা','footer.terms':'শর্তাবলী','footer.security':'নিরাপত্তা','footer.crisis':'সংকট সম্পদ',
+    'footer.copy':'© ২০২৬ MindMate. শিক্ষার্থীদের জন্য 💙।',
+    'footer.disclaimer':'MindMate পেশাদার মানসিক স্বাস্থ্য সেবার বিকল্প নয়।',
+    quotes:["আপনাকে সবকিছু একা বহন করতে হবে না।","বিশ্রাম উৎপাদনশীল।","ছোট পদক্ষেপও এগিয়ে নিয়ে যায়।","ঠিক না থাকা ঠিক আছে।","আপনি ভাবার চেয়ে ভালো করছেন।","একবারে একটি শ্বাসই যথেষ্ট।"],
+  },
+  te:{
+    'nav.features':'లక్షణాలు','nav.how':'ఎలా పని చేస్తుంది','nav.about':'మా గురించి',
+    'nav.resources':'వనరులు','nav.signup':'ఉచితంగా సైన్ అప్','nav.login':'లాగిన్',
+    'hero.eyebrow':'క్యాంపస్‌లో మీ నిశ్శబ్ద మూల',
+    'hero.h1a':'ఒక మృదువైన స్థలం','hero.h1b':'మీ ','hero.h1em':'మనసు','hero.h1c':' విశ్రాంతికి.',
+    'hero.sub':'MindMate విద్యార్థులకు రోజూ తమతో చెక్ ఇన్ చేసుకోవడంలో సహాయం చేస్తుంది.',
+    'hero.cta1':'✦ చెక్-ఇన్ ప్రారంభించు','hero.cta2':'ఎలా పని చేస్తుందో చూడండి',
+    'hero.note':'ఎల్లప్పుడూ అనామక. ఎప్పటికీ తీర్పు లేదు. ఎల్లప్పుడూ ఇక్కడ.',
+    'card.aiLabel':'AI అంతర్దృష్టి','card.aiVal':'మీరు ఇటీవల అలసటగా కనిపిస్తున్నారు',
+    'card.weekLabel':'ఈ వారం','card.weekVal':'మూడ్ +18% మెరుగుపడింది',
+    'trust.anon':'100% అనామక','trust.ai':'Gemini AI చేత నడపబడుతుంది',
+    'trust.nojudge':'తీర్పు లేని జోన్','trust.reports':'వీక్లీ వెల్నెస్ రిపోర్టులు','trust.students':'విద్యార్థుల కోసం',
+    'features.tag':'మేము ఏమి అందిస్తున్నాము','features.title':'కొంచెం మెరుగ్గా అనిపించడానికి కావలసినవన్నీ',
+    'features.sub':'మీ మానసిక ఆరోగ్యాన్ని మద్దతు ఇవ్వడానికి చిన్న సాధనాలు.',
+    'f1.title':'మూడ్ చెక్-ఇన్లు','f1.desc':'ఒక సాధారణ ఇమోజీ-ఆధారిత రోజువారీ చెక్-ఇన్.',
+    'f2.title':'AI అంతర్దృష్టులు','f2.desc':'Gemini AI మీ నమూనాలను నెమ్మదిగా విశ్లేషిస్తుంది.',
+    'f3.title':'వ్యక్తిగతీకరించిన కోపింగ్','f3.desc':'శ్వాస వ్యాయామాలు, ప్రశాంత సంగీతం, విరామ రిమైండర్లు.',
+    'f4.title':'ఐచ్ఛిక జర్నలింగ్','f4.desc':'మీ ఆలోచనలు రాయడానికి ప్రైవేట్ స్థలం.',
+    'f5.title':'వీక్లీ వెల్నెస్ ట్రెండ్లు','f5.desc':'మీ భావోద్వేగ ప్రయాణాన్ని చూపించే సరళమైన గ్రాఫ్‌లు.',
+    'how.tag':'సాధారణ ప్రక్రియ','how.title1':'నాలుగు చిన్న దశలు.','how.title2':'అర్థవంతమైన తేడా.',
+    'how.sub':'క్లిష్టమైన సెటప్ లేదు. మీ రోజులో సరిపోయే దినచర్య.',
+    'step1.title':'రోజువారీ చెక్-ఇన్','step1.desc':'ఒక ఇమోజీని నొక్కండి. 30 సెకన్లలోపు.',
+    'step2.title':'జర్నల్ (ఐచ్ఛికం)','step2.desc':'కొన్ని మాటలు రాయండి. పూర్తిగా ప్రైవేట్.',
+    'step3.title':'AI నమూనాను చదువుతుంది','step3.desc':'Gemini AI నిశ్శబ్దంగా ట్రెండ్లను గమనిస్తుంది.',
+    'step4.title':'మృదువైన సూచనలు','step4.desc':'వ్యక్తిగతీకరించిన కోపింగ్ సిఫారసులు.',
+    'phone.greeting':'శుభ సాయంత్రం, అర్జున్ 👋','phone.question':'నేడు మీకు ఎలా అనిపిస్తుందో?',
+    'phone.insightTitle':'💡 AI నోటీస్','phone.insightBody':'ఈ వారం 4 రోజులు అలసటగా చెక్ ఇన్ చేశారు.',
+    'phone.tag1':'🎵 ప్రశాంత సంగీతం','phone.tag2':'🚶 5-నిమిష నడక','phone.tag3':'🌬 శ్వాసించండి',
+    'quotes.tag':'మీకు ఒక రిమైండర్',
+    'cta.title':'నేడు మీ కోసం ఒక క్షణం తీసుకోండి.','cta.sub':'సరిగ్గా లేకపోవడం సరే. MindMate ఎల్లప్పుడూ ఇక్కడ.',
+    'cta.btn1':'✦ ఇప్పుడు ప్రారంభించండి','cta.btn2':'మరింత తెలుసుకోండి',
+    'helpline.title':'మీరు ఒంటరిగా లేరు — సహాయం అందుబాటులో ఉంది',
+    'helpline.sub':'మీరు అభిభవించినట్లు అనిపిస్తే, నిపుణుడిని సంప్రదించండి.',
+    'footer.tagline':'విద్యార్థుల కోసం మృదువైన వెల్నెస్ సహచరుడు.',
+    'footer.product':'ఉత్పత్తి','footer.company':'కంపెనీ','footer.legal':'చట్టపరమైనది',
+    'footer.pricing':'ధర','footer.changelog':'మార్పుల లాగ్','footer.about':'మా గురించి',
+    'footer.blog':'బ్లాగ్','footer.careers':'కెరీర్లు','footer.contact':'సంప్రదించండి',
+    'footer.privacy':'గోప్యత','footer.terms':'నిబంధనలు','footer.security':'భద్రత','footer.crisis':'సంక్షోభ వనరులు',
+    'footer.copy':'© 2026 MindMate. విద్యార్థుల కోసం 💙.',
+    'footer.disclaimer':'MindMate వృత్తిపరమైన మానసిక ఆరోగ్య సంరక్షణకు ప్రత్యామ్నాయం కాదు.',
+    quotes:["మీరు అన్నింటినీ ఒంటరిగా మోయాల్సిన అవసరం లేదు.","విశ్రాంతి ఉత్పాదకత.","చిన్న అడుగులు కూడా ముందుకు తీసుకువెళతాయి.","సరిగ్గా లేకపోవడం సరే.","మీరు అనుకున్నదానికంటే మెరుగ్గా చేస్తున్నారు.","ఒక్కో శ్వాస సరిపోతుంది."],
+  },
+  mr:{
+    'nav.features':'वैशिष्ट्ये','nav.how':'हे कसे कार्य करते','nav.about':'आमच्याबद्दल',
+    'nav.resources':'संसाधने','nav.signup':'मोफत साइन अप','nav.login':'लॉगिन',
+    'hero.eyebrow':'कॅम्पसवरील तुमचा शांत कोपरा',
+    'hero.h1a':'एक कोमल जागा','hero.h1b':'तुमच्या ','hero.h1em':'मनासाठी','hero.h1c':' विश्रांतीसाठी.',
+    'hero.sub':'MindMate विद्यार्थ्यांना दररोज स्वतःशी चेक इन करण्यास मदत करते.',
+    'hero.cta1':'✦ चेक-इन सुरू करा','hero.cta2':'हे कसे कार्य करते पहा',
+    'hero.note':'नेहमी अनामिक. कधीही निर्णय नाही. नेहमी इथे.',
+    'card.aiLabel':'AI अंतर्दृष्टी','card.aiVal':'तुम्ही अलीकडे थकलेले वाटत आहात',
+    'card.weekLabel':'या आठवड्यात','card.weekVal':'मूड +18% सुधारला',
+    'trust.anon':'100% अनामिक','trust.ai':'Gemini AI द्वारे चालवले जाते',
+    'trust.nojudge':'निर्णयमुक्त क्षेत्र','trust.reports':'साप्ताहिक वेलनेस अहवाल','trust.students':'विद्यार्थ्यांसाठी',
+    'features.tag':'आम्ही काय ऑफर करतो','features.title':'थोडे बरे वाटण्यासाठी आवश्यक सर्व काही',
+    'features.sub':'तुमच्या मानसिक आरोग्याला समर्थन देण्यासाठी लहान साधने.',
+    'f1.title':'मूड चेक-इन','f1.desc':'एक साधा इमोजी-आधारित दैनंदिन चेक-इन.',
+    'f2.title':'AI-चालित अंतर्दृष्टी','f2.desc':'Gemini AI तुमच्या पॅटर्नचे विश्लेषण करते.',
+    'f3.title':'वैयक्तिकृत मुकाबला','f3.desc':'श्वासोच्छवासाचे व्यायाम, शांत संगीत, विश्रांतीचे अनुस्मारक.',
+    'f4.title':'पर्यायी जर्नलिंग','f4.desc':'तुमचे विचार लिहिण्यासाठी एक खाजगी जागा.',
+    'f5.title':'साप्ताहिक ट्रेंड','f5.desc':'तुमचा भावनिक प्रवास दाखवणारे साधे आलेख.',
+    'how.tag':'सोपी प्रक्रिया','how.title1':'चार छोटी पावले.','how.title2':'एक अर्थपूर्ण फरक.',
+    'how.sub':'कोणतेही क्लिष्ट सेटअप नाही. तुमच्या दिवसात बसणारी दिनचर्या.',
+    'step1.title':'दैनंदिन चेक-इन','step1.desc':'एक इमोजी टॅप करा. 30 सेकंदांपेक्षा कमी.',
+    'step2.title':'जर्नल (पर्यायी)','step2.desc':'काही शब्द लिहा. पूर्णपणे खाजगी.',
+    'step3.title':'AI पॅटर्न वाचतो','step3.desc':'Gemini AI शांतपणे ट्रेंड लक्षात घेतो.',
+    'step4.title':'कोमल सूचना मिळवा','step4.desc':'वैयक्तिकृत मुकाबला शिफारसी.',
+    'phone.greeting':'शुभ संध्याकाळ, अर्जुन 👋','phone.question':'आज तुम्हाला कसे वाटते?',
+    'phone.insightTitle':'💡 AI सूचना','phone.insightBody':'या आठवड्यात 4 दिवस थकलेले चेक इन केले.',
+    'phone.tag1':'🎵 शांत संगीत','phone.tag2':'🚶 5-मिनिट चाल','phone.tag3':'🌬 श्वास घ्या',
+    'quotes.tag':'तुमच्यासाठी एक स्मरण',
+    'cta.title':'आज स्वतःसाठी एक क्षण काढा.','cta.sub':'ठीक नसणे ठीक आहे. MindMate नेहमी इथे आहे.',
+    'cta.btn1':'✦ आता सुरू करा','cta.btn2':'अधिक जाणून घ्या',
+    'helpline.title':'तुम्ही एकटे नाही — मदत उपलब्ध आहे',
+    'helpline.sub':'जर तुम्हाला अभिभूत वाटत असेल, व्यावसायिकांशी संपर्क साधा.',
+    'footer.tagline':'विद्यार्थ्यांसाठी एक कोमल वेलनेस साथीदार.',
+    'footer.product':'उत्पादन','footer.company':'कंपनी','footer.legal':'कायदेशीर',
+    'footer.pricing':'मूल्य निर्धारण','footer.changelog':'बदललॉग','footer.about':'आमच्याबद्दल',
+    'footer.blog':'ब्लॉग','footer.careers':'करिअर','footer.contact':'संपर्क',
+    'footer.privacy':'गोपनीयता','footer.terms':'अटी','footer.security':'सुरक्षा','footer.crisis':'संकट संसाधने',
+    'footer.copy':'© 2026 MindMate. विद्यार्थ्यांसाठी 💙 ने बनवले.',
+    'footer.disclaimer':'MindMate व्यावसायिक मानसिक आरोग्य सेवेचा पर्याय नाही.',
+    quotes:["तुम्हाला सर्व काही एकट्याने वाहायचे नाही.","विश्रांती उत्पादक आहे.","छोटी पावलेही पुढे नेतात.","ठीक नसणे ठीक आहे.","तुम्ही विचार करता त्यापेक्षा चांगले करत आहात.","एकावेळी एक श्वास पुरेसा आहे."],
+  },
+};
+
+// ================================================================
+// LANGUAGE ENGINE
+// ================================================================
+let activeLang = 'en';
+const quotes = [...T.en.quotes];
+let currentQuote = 0;
+
+function buildLangDropdown() {
+  const panel = document.getElementById('langPanel');
+  panel.innerHTML = '';
+  LANGS.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-opt' + (l.code === activeLang ? ' active' : '');
+    btn.setAttribute('role','option');
+    btn.innerHTML = `<span class="loflag">${l.flag}</span><span class="lang-opt-info"><span class="lang-opt-name">${l.name}</span><span class="lang-opt-native">${l.native}</span></span>`;
+    btn.onclick = () => { setLang(l.code); closeLangPanel(); };
+    panel.appendChild(btn);
+  });
+}
+
+function buildMobileLang() {
+  const row = document.getElementById('mobLangRow');
+  row.innerHTML = '';
+  LANGS.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'mob-lang-chip' + (l.code === activeLang ? ' active' : '');
+    btn.textContent = l.native;
+    btn.onclick = () => setLang(l.code);
+    row.appendChild(btn);
+  });
+}
+
+function updateLangBtn() {
+  const l = LANGS.find(x => x.code === activeLang);
+  document.getElementById('langFlag').textContent = l.flag;
+  document.getElementById('langLabel').textContent = l.name;
+}
+
+function applyT(code) {
+  const t = T[code] || T.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+  document.documentElement.lang = code;
+  // update quote pool
+  const qs = (t.quotes && t.quotes.length) ? t.quotes : T.en.quotes;
+  quotes.splice(0, quotes.length, ...qs);
+  goToQuote(0);
+}
+
+function setLang(code) {
+  activeLang = code;
+  applyT(code);
+  updateLangBtn();
+  buildLangDropdown();
+  buildMobileLang();
+  localStorage.setItem('mm-lang', code);
+}
+
+// Desktop dropdown toggle
+const langBtn = document.getElementById('langBtn');
+const langPanel = document.getElementById('langPanel');
+function closeLangPanel() {
+  langPanel.classList.remove('open');
+  langBtn.classList.remove('open');
+  langBtn.setAttribute('aria-expanded','false');
+}
+langBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = langPanel.classList.toggle('open');
+  langBtn.classList.toggle('open', open);
+  langBtn.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#langSwitcher')) closeLangPanel();
+});
+
+// ================================================================
+// THEME ENGINE  — Midnight is the default
+// ================================================================
+const themeToggle = document.getElementById('themeToggle');
+const themePanel  = document.getElementById('themePanel');
+
+themeToggle.addEventListener('click', () => {
+  const open = themePanel.classList.toggle('open');
+  themeToggle.classList.toggle('open', open);
+  themeToggle.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.theme-switcher')) {
+    themePanel.classList.remove('open');
+    themeToggle.classList.remove('open');
+    themeToggle.setAttribute('aria-expanded', false);
+  }
+});
+
+function setTheme(theme, btn) {
+  const root = document.documentElement;
+  root.removeAttribute('data-theme');
+  if (theme !== 'default') root.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-option').forEach(b => {
+    b.classList.remove('active');
+    // restore name without checkmark
+    const nameEl = b.querySelector('.theme-option-name');
+    if (nameEl) nameEl.textContent = nameEl.textContent.replace(' ✓','');
+  });
+  btn.classList.add('active');
+  const nameEl = btn.querySelector('.theme-option-name');
+  if (nameEl && !nameEl.textContent.includes('✓')) nameEl.textContent += ' ✓';
+  localStorage.setItem('mm-theme', theme);
+  setTimeout(() => {
+    themePanel.classList.remove('open');
+    themeToggle.classList.remove('open');
+    themeToggle.setAttribute('aria-expanded', false);
+  }, 300);
+}
+
+// Apply saved theme OR default to midnight
+const savedTheme = localStorage.getItem('mm-theme') || 'midnight';
+const savedThemeBtn = document.querySelector(`.theme-option[data-theme="${savedTheme}"]`);
+if (savedThemeBtn) setTheme(savedTheme, savedThemeBtn);
+
+// ================================================================
+// NAV SCROLL
+// ================================================================
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 10));
+
+// ================================================================
+// HAMBURGER
+// ================================================================
+const hamburger = document.getElementById('hamburger');
+const mobileNav  = document.getElementById('mobileNav');
+hamburger.addEventListener('click', () => {
+  const open = mobileNav.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', open);
+});
+
+// ================================================================
+// MOOD EMOJIS
+// ================================================================
+document.querySelectorAll('.mood-emoji').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+  });
+});
+
+// ================================================================
+// QUOTE ROTATOR
+// ================================================================
+const quoteText = document.getElementById('quoteText');
+const quoteDots = document.getElementById('quoteDots');
+
+function buildDots() {
+  quoteDots.innerHTML = '';
+  quotes.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'quote-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('role','tab');
+    d.setAttribute('aria-label', `Quote ${i+1}`);
+    d.addEventListener('click', () => goToQuote(i));
+    quoteDots.appendChild(d);
+  });
+}
+
+function goToQuote(idx) {
+  quoteText.classList.add('fade');
+  setTimeout(() => {
+    currentQuote = idx % quotes.length;
+    quoteText.textContent = quotes[currentQuote];
+    quoteText.classList.remove('fade');
+    document.querySelectorAll('.quote-dot').forEach((d,i) => d.classList.toggle('active', i === currentQuote));
+  }, 500);
+}
+
+buildDots();
+setInterval(() => goToQuote((currentQuote + 1) % quotes.length), 4500);
+
+// ================================================================
+// SCROLL FADE-UP
+// ================================================================
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ================================================================
+// HERO ENTRANCE
+// ================================================================
+const heroCopy = document.querySelector('.hero-copy');
+if (heroCopy) {
+  heroCopy.style.cssText = 'opacity:0;transform:translateY(20px);transition:opacity 0.9s ease,transform 0.9s ease;';
+  setTimeout(() => heroCopy.style.cssText = 'opacity:1;transform:translateY(0);transition:opacity 0.9s ease,transform 0.9s ease;', 100);
+}
+
+// ================================================================
+// INIT LANGUAGE SYSTEM
+// ================================================================
+buildLangDropdown();
+buildMobileLang();
+const savedLang = localStorage.getItem('mm-lang') || 'en';
+if (savedLang !== 'en') setLang(savedLang);
+else { updateLangBtn(); }
+</script>
+</body>
+</html>
