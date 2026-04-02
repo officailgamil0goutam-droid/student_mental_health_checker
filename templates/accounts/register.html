@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindMate — Register</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d0d1a;
+    --card:      #181830;
+    --border:    rgba(255,255,255,0.07);
+    --purple:    #9b7ff4;
+    --purple-dim:#7b5fd4;
+    --green:     #4ade80;
+    --text:      #e8e8f0;
+    --muted:     #8888aa;
+    --radius:    14px;
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(80,40,180,.33) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 80%, rgba(20,100,80,.22) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 90% 90%, rgba(120,60,200,.14) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    pointer-events: none; opacity: .6;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+  .logo { display: flex; align-items: center; gap: 8px; font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--text); text-decoration: none; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .lang-pill { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); font-size: .8rem; color: var(--muted); cursor: pointer; }
+  .btn-nav { padding: 10px 22px; border-radius: 999px; background: var(--purple); color: #fff; font-size: .88rem; font-weight: 500; border: none; cursor: pointer; transition: background .2s, transform .15s; }
+  .btn-nav:hover { background: var(--purple-dim); transform: translateY(-1px); }
+
+  /* LAYOUT */
+  .page {
+    position: relative; z-index: 5;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 48px 24px 80px;
+  }
+
+  /* CARD */
+  .card {
+    width: 100%; max-width: 520px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 44px 44px;
+    box-shadow:
+      0 0 0 1px rgba(155,127,244,.08),
+      0 40px 80px rgba(0,0,0,.5),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    animation: cardIn .55s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STEP NAV */
+  .step-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-bottom: 36px;
+  }
+  .step-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 999px;
+    font-size: .75rem; font-weight: 600; letter-spacing: .03em;
+    border: 1px solid var(--border);
+    color: var(--muted); background: transparent;
+    transition: all .3s;
+  }
+  .step-pill.active { background: rgba(155,127,244,.15); border-color: rgba(155,127,244,.4); color: var(--purple); }
+  .step-pill.done   { background: rgba(74,222,128,.1);  border-color: rgba(74,222,128,.3);  color: var(--green); }
+  .step-connector { width: 28px; height: 1px; background: var(--border); transition: background .3s; }
+  .step-connector.done { background: var(--green); }
+
+  /* STEPS */
+  .step { display: none; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+  .step.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header { margin-bottom: 28px; }
+  .eyebrow { font-size: .75rem; color: var(--green); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+  .card-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.75rem; color: #fff; margin-bottom: 6px; }
+  .card-header p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
+
+  /* GOOGLE */
+  .btn-google {
+    width: 100%; padding: 13px 20px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text); font-size: .9rem; font-weight: 500;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .2s, border-color .2s;
+    margin-bottom: 18px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-google:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.15); }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: var(--muted); font-size: .78rem; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* FIELDS */
+  .fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: .76rem; color: var(--muted); font-weight: 500; letter-spacing: .03em; }
+  .field input, .field select {
+    padding: 12px 16px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text); font-size: .9rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+    appearance: none;
+  }
+  .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888aa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .field select option { background: #181830; }
+  .field input::placeholder { color: rgba(255,255,255,.2); }
+  .field input:focus, .field select:focus { border-color: var(--purple); background: rgba(155,127,244,.06); box-shadow: 0 0 0 3px rgba(155,127,244,.12); }
+
+  /* PW */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { width: 100%; padding-right: 44px; }
+  .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; transition: color .2s; }
+  .pw-toggle:hover { color: var(--text); }
+
+  .strength { display: flex; gap: 4px; margin-top: 6px; }
+  .strength span { flex: 1; height: 3px; border-radius: 99px; background: var(--border); transition: background .3s; }
+  .strength.s1 span:nth-child(1) { background: #f87171; }
+  .strength.s2 span:nth-child(-n+2) { background: #fb923c; }
+  .strength.s3 span:nth-child(-n+3) { background: #facc15; }
+  .strength.s4 span { background: var(--green); }
+
+  /* INTERESTS */
+  .interests { display: flex; flex-wrap: wrap; gap: 8px; }
+  .interest-chip {
+    padding: 7px 14px; border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: .82rem; color: var(--muted);
+    cursor: pointer; transition: all .2s; user-select: none;
+    background: rgba(255,255,255,.03);
+  }
+  .interest-chip:hover { border-color: rgba(155,127,244,.4); color: var(--text); }
+  .interest-chip.selected { background: rgba(155,127,244,.15); border-color: rgba(155,127,244,.5); color: var(--purple); }
+
+  /* AVATAR */
+  .avatar-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .avatar-opt {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    background: rgba(255,255,255,.04);
+  }
+  .avatar-opt:hover { transform: scale(1.1); border-color: rgba(155,127,244,.5); }
+  .avatar-opt.selected { border-color: var(--purple); background: rgba(155,127,244,.12); }
+
+  /* TERMS */
+  .terms { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; font-size: .8rem; color: var(--muted); line-height: 1.5; }
+  .terms input[type=checkbox] { accent-color: var(--purple); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+  .terms a { color: var(--purple); text-decoration: none; }
+  .terms a:hover { text-decoration: underline; }
+
+  /* BUTTONS */
+  .btn-primary {
+    width: 100%; padding: 14px;
+    background: var(--purple); border: none; border-radius: var(--radius);
+    color: #fff; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(155,127,244,.3);
+    margin-bottom: 10px;
+  }
+  .btn-primary:hover { background: var(--purple-dim); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(155,127,244,.4); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-ghost {
+    width: 100%; padding: 13px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted); font-size: .9rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, color .2s, border-color .2s; margin-bottom: 10px;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.08); color: var(--text); border-color: rgba(255,255,255,.14); }
+
+  .footer-link { text-align: center; font-size: .83rem; color: var(--muted); margin-top: 14px; }
+  .footer-link a { color: var(--purple); text-decoration: none; }
+  .footer-link a:hover { text-decoration: underline; }
+
+  /* SUCCESS */
+  .success-wrap { text-align: center; padding: 20px 0; }
+  .check-anim { width: 72px; height: 72px; border-radius: 50%; background: rgba(74,222,128,.1); border: 2px solid var(--green); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes popIn { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+  .confetti { font-size: 2rem; margin-bottom: 12px; }
+  .success-wrap h2 { font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: #fff; margin-bottom: 10px; }
+  .success-wrap p { color: var(--muted); font-size: .9rem; line-height: 1.6; max-width: 320px; margin: 0 auto 28px; }
+
+  /* BADGE */
+  .badge {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 20;
+    background: rgba(13,13,26,.85); border: 1px solid var(--border);
+    backdrop-filter: blur(12px); border-radius: 999px;
+    padding: 10px 20px; font-size: .78rem; color: var(--muted);
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .card { padding: 28px 20px; }
+    .row-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#"><span class="logo-dot"></span> MindMate</a>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">How It Works</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Resources</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-pill">🇬🇧 English ▾</div>
+    <button class="btn-nav">Sign Up Free</button>
+  </div>
+</nav>
+
+<div class="page">
+<div class="card">
+
+  <!-- STEP BAR -->
+  <div class="step-bar" id="step-bar">
+    <div class="step-pill active" id="pill1">1 · Account</div>
+    <div class="step-connector" id="con1"></div>
+    <div class="step-pill" id="pill2">2 · Profile</div>
+    <div class="step-connector" id="con2"></div>
+    <div class="step-pill" id="pill3">3 · Wellbeing</div>
+  </div>
+
+  <!-- ─── STEP 1: Account ─── -->
+  <div class="step active" id="step1">
+    <div class="card-header">
+      <div class="eyebrow">Step 1 of 3</div>
+      <h2>Create your account</h2>
+      <p>Free forever. No credit card needed.</p>
+    </div>
+
+    <button class="btn-google">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="divider">or register with email</div>
+
+    <div class="fields">
+      <div class="row-2">
+        <div class="field"><label>First name</label><input type="text" placeholder="Alex" /></div>
+        <div class="field"><label>Last name</label><input type="text" placeholder="Morgan" /></div>
+      </div>
+      <div class="field"><label>University email</label><input type="email" placeholder="you@university.edu" /></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="pw1" placeholder="At least 8 characters" oninput="checkStr(this.value)" />
+          <button class="pw-toggle" onclick="togglePw('pw1','e1')" type="button">
+            <svg id="e1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="strength" id="str"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <div class="pw-wrap">
+          <input type="password" id="pw2" placeholder="Repeat password" />
+          <button class="pw-toggle" onclick="togglePw('pw2','e2')" type="button">
+            <svg id="e2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="terms">
+      <input type="checkbox" id="agree" onchange="document.getElementById('next1').disabled=!this.checked" />
+      <label for="agree">I agree to MindMate's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. My data is always anonymous.</label>
+    </div>
+
+    <button class="btn-primary" id="next1" onclick="goStep(2)" disabled>
+      Continue
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+
+    <div class="footer-link">Already have an account? <a href="#">Sign in</a></div>
+  </div>
+
+  <!-- ─── STEP 2: Profile ─── -->
+  <div class="step" id="step2">
+    <div class="card-header">
+      <div class="eyebrow">Step 2 of 3</div>
+      <h2>Tell us about you</h2>
+      <p>This helps us personalise your MindMate experience.</p>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label>University / Institution</label>
+        <input type="text" placeholder="e.g. University of Edinburgh" />
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Year of study</label>
+          <select>
+            <option value="" disabled selected>Select year</option>
+            <option>1st Year</option><option>2nd Year</option><option>3rd Year</option>
+            <option>4th Year</option><option>Postgraduate</option><option>PhD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Subject area</label>
+          <select>
+            <option value="" disabled selected>Select area</option>
+            <option>Arts & Humanities</option><option>Sciences</option>
+            <option>Engineering</option><option>Medicine</option>
+            <option>Business</option><option>Law</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label style="margin-bottom:10px;">Choose your avatar</label>
+        <div class="avatar-row" id="avatars">
+          <div class="avatar-opt" onclick="pickAvatar(this)">🌙</div>
+          <div class="avatar-opt" onclick="pickAvatar(this)">🌿</div>
+          <div class="avatar-opt" onclick="pickAvatar(this)">🌊</div>
+          <div class="avatar-opt" onclick="pickAvatar(this)">☀️</div>
+          <div class="avatar-opt" onclick="pickAvatar(this)">🔮</div>
+          <div class="avatar-opt" onclick="pickAvatar(this)">🦋</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Pronouns <span style="color:rgba(136,136,170,.5);">(optional)</span></label>
+        <select>
+          <option value="" disabled selected>Prefer not to say</option>
+          <option>He / Him</option><option>She / Her</option><option>They / Them</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <br/>
+    <button class="btn-primary" onclick="goStep(3)">
+      Continue
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <button class="btn-ghost" onclick="goStep(1)">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      Back
+    </button>
+  </div>
+
+  <!-- ─── STEP 3: Wellbeing ─── -->
+  <div class="step" id="step3">
+    <div class="card-header">
+      <div class="eyebrow">Step 3 of 3</div>
+      <h2>What's weighing on you?</h2>
+      <p>Select anything that feels relevant. This shapes your daily check-ins.</p>
+    </div>
+
+    <div class="interests" id="chips" style="margin-bottom:24px;">
+      <div class="interest-chip" onclick="toggleChip(this)">😰 Exam stress</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🛏 Sleep issues</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🤯 Burnout</div>
+      <div class="interest-chip" onclick="toggleChip(this)">💸 Financial worry</div>
+      <div class="interest-chip" onclick="toggleChip(this)">😔 Low mood</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🫀 Anxiety</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🤝 Loneliness</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🧠 Focus & ADHD</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🏠 Homesickness</div>
+      <div class="interest-chip" onclick="toggleChip(this)">📚 Imposter syndrome</div>
+      <div class="interest-chip" onclick="toggleChip(this)">💔 Relationships</div>
+      <div class="interest-chip" onclick="toggleChip(this)">🌱 Just exploring</div>
+    </div>
+
+    <div class="field" style="margin-bottom:20px;">
+      <label>How are you feeling right now?</label>
+      <select>
+        <option value="" disabled selected>Choose a mood</option>
+        <option>😊 Good — just checking in</option>
+        <option>😐 Okay but could be better</option>
+        <option>😔 Struggling a bit</option>
+        <option>😰 Really overwhelmed</option>
+        <option>😶 Not sure / blank</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="goStep(4)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Begin My Journey
+    </button>
+    <button class="btn-ghost" onclick="goStep(2)">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      Back
+    </button>
+  </div>
+
+  <!-- ─── STEP 4: Success ─── -->
+  <div class="step" id="step4">
+    <div class="success-wrap">
+      <div class="confetti">🎉</div>
+      <div class="check-anim">
+        <svg width="32" height="32" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Welcome to MindMate</h2>
+      <p>Your quiet corner on campus is ready. Check in daily, track your mood, and let us walk alongside you.</p>
+      <button class="btn-primary" style="max-width:280px; margin:0 auto;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Go to Dashboard
+      </button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- BADGE -->
+<div class="badge">
+  <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Always anonymous. Never judgmental. Always here.
+</div>
+
+<script>
+  function goStep(n) {
+    document.querySelectorAll('.step').forEach((s,i) => s.classList.toggle('active', i === n-1));
+    // pills
+    [1,2,3].forEach(i => {
+      const p = document.getElementById('pill'+i);
+      p.classList.remove('active','done');
+      if (i < n) p.classList.add('done');
+      else if (i === n) p.classList.add('active');
+      if (i < 3) document.getElementById('con'+i).classList.toggle('done', i < n);
+    });
+    if (n === 4) document.getElementById('step-bar').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleChip(el) { el.classList.toggle('selected'); }
+  function pickAvatar(el) {
+    document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function togglePw(id, iconId) {
+    const pw = document.getElementById(id);
+    const icon = document.getElementById(iconId);
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      pw.type = 'password';
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
+  }
+
+  function checkStr(val) {
+    const bar = document.getElementById('str');
+    bar.className = 'strength';
+    if (!val) return;
+    let s = 0;
+    if (val.length >= 8) s++;
+    if (/[A-Z]/.test(val)) s++;
+    if (/[0-9]/.test(val)) s++;
+    if (/[^A-Za-z0-9]/.test(val)) s++;
+    bar.classList.add('s' + s);
+  }
+</script>
+</body>
+</html>
