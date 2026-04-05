@@ -1,0 +1,19 @@
+<h2>Wellness Check</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Mood:</label>
+    {{ form.mood }} <br><br>
+
+    <label>Stress Level (1-10):</label>
+    {{ form.stress_level }} <br><br>
+
+    <label>Sleep Quality (1-10):</label>
+    {{ form.sleep_quality }} <br><br>
+
+    <label>Note:</label>
+    {{ form.note }} <br><br>
+
+    <button type="submit">Submit</button>
+</form>
