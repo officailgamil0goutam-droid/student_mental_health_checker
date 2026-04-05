@@ -376,7 +376,7 @@
             <div class="lang-panel" id="langPanel" role="listbox"></div>
           </div>
         </li>
-        <li><a href="{% url 'login' %}" class="btn btn-primary nav-cta" data-i18n="nav.signup">Sign Up Free</a></li>
+        <li><a href="{% url 'register' %}" class="btn btn-primary nav-cta" data-i18n="nav.signup">Sign Up Free</a></li>
       </ul>
       <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false" id="hamburger">
         <span></span><span></span><span></span>
@@ -388,7 +388,7 @@
       <a href="#about" data-i18n="nav.about">About</a>
       <a href="#helpline" data-i18n="nav.resources">Resources</a>
       <a href="#" data-i18n="nav.login">Login</a>
-      <a href="#" style="color:var(--accent);font-weight:500;" data-i18n="nav.signup">Sign Up Free</a>
+      <a href="{% url 'register' %}" style="color:var(--accent);font-weight:500;" data-i18n="nav.signup">Sign Up Free</a>
       <!-- LANGUAGE SWITCHER (mobile) -->
       <div class="mob-lang-wrap">
         <div class="mob-lang-label">Language / भाषा / மொழி</div>
@@ -412,7 +412,7 @@
         </h1>
         <p class="hero-sub" data-i18n="hero.sub">MindMate helps students check in with themselves daily — tracking mood, journaling thoughts, and offering AI-guided support to navigate stress, burnout, and the weight of student life.</p>
         <div class="hero-actions">
-          <a href="#" class="btn btn-primary" data-i18n="hero.cta1">✦ Begin Check-In</a>
+          <a href="{% url 'register' %}" class="btn btn-primary" data-i18n="hero.cta1">✦ Begin Check-In</a>
           <a href="#how" class="btn btn-ghost" data-i18n="hero.cta2">See How It Works</a>
         </div>
         <p class="hero-note" data-i18n="hero.note">Always anonymous. Never judgmental. Always here.</p>
@@ -554,7 +554,7 @@
         <h2 id="cta-heading" data-i18n="cta.title">Take a moment for yourself today.</h2>
         <p data-i18n="cta.sub">It's okay to not be okay. MindMate is here whenever you need it — quietly, gently, always.</p>
         <div class="cta-actions">
-          <a href="#" class="btn btn-primary" data-i18n="cta.btn1">✦ Begin Now</a>
+          <a href="{% url 'register' %}" class="btn btn-primary" data-i18n="cta.btn1">✦ Begin Now</a>
           <a href="#" class="btn btn-ghost" data-i18n="cta.btn2">Learn More</a>
         </div>
       </div>

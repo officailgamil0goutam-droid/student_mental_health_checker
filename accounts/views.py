@@ -17,7 +17,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # 👈 auto login
-            return redirect('/mood/check/')  # 👈 redirect here
+            return redirect('home')  # 👈 redirect here
     else:
         form = RegisterForm()
 
