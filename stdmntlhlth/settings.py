@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'home.apps.HomeConfig',
     'accounts.apps.AccountsConfig',
     'mood',
@@ -156,3 +157,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your@gmail.com'        # your gmail
 EMAIL_HOST_PASSWORD = 'your_app_password' # gmail app password
 DEFAULT_FROM_EMAIL = 'your@gmail.com'
+
+# Allauth Settings
+SOCIALACCOUNT_LOGIN_ON_GET = True

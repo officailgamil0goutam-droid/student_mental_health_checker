@@ -1,0 +1,278 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindMate — Complete Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0d0d1a;
+    --card:       #181830;
+    --border:     rgba(255,255,255,0.07);
+    --purple:     #9b7ff4;
+    --purple-dim: #7b5fd4;
+    --green:      #4ade80;
+    --text:       #e8e8f0;
+    --muted:      #8888aa;
+    --radius:     14px;
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* mesh background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 75% 60% at 65% 5%,  rgba(80,40,180,.38) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 50% at 10% 85%, rgba(20,100,80,.24) 0%, transparent 55%),
+      radial-gradient(ellipse 45% 40% at 92% 92%, rgba(120,60,200,.16) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* grain */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    pointer-events: none; opacity: .6;
+  }
+
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem; color: var(--text); text-decoration: none;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+
+  .page {
+    position: relative; z-index: 5;
+    min-height: calc(100vh - 69px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .card {
+    width: 100%; max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 44px 40px;
+    box-shadow:
+      0 0 0 1px rgba(155,127,244,.08),
+      0 40px 80px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    animation: cardIn .55s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top { text-align: center; margin-bottom: 32px; }
+
+  .logo-mark {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem; color: var(--text);
+    margin-bottom: 20px;
+  }
+  .logo-mark span {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--purple);
+    box-shadow: 0 0 10px rgba(155,127,244,.6);
+  }
+
+  .card-top h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.75rem; color: #fff; margin-bottom: 7px;
+  }
+  .card-top p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
+
+  /* Provider badge */
+  .provider-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(155,127,244,.1);
+    border: 1px solid rgba(155,127,244,.2);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: .82rem; color: var(--purple);
+    margin-bottom: 28px;
+  }
+  .provider-badge svg { flex-shrink: 0; }
+
+  /* field */
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field label { font-size: .76rem; color: var(--muted); font-weight: 500; letter-spacing: .03em; }
+  .field input {
+    padding: 13px 16px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text); font-size: .9rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+    width: 100%;
+  }
+  .field input::placeholder { color: rgba(255,255,255,.2); }
+  .field input:focus {
+    border-color: var(--purple);
+    background: rgba(155,127,244,.06);
+    box-shadow: 0 0 0 3px rgba(155,127,244,.12);
+  }
+  .errorlist {
+    list-style: none; color: #f87171;
+    font-size: .78rem; margin-top: 4px; padding: 0;
+  }
+
+  /* info box */
+  .info-box {
+    background: rgba(155,127,244,.06);
+    border: 1px solid rgba(155,127,244,.15);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: .8rem; color: var(--muted);
+    margin-bottom: 20px;
+    display: flex; align-items: flex-start; gap: 9px;
+    line-height: 1.5;
+  }
+  .info-box svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* submit */
+  .btn-submit {
+    width: 100%; padding: 14px;
+    background: var(--purple); border: none; border-radius: var(--radius);
+    color: #fff; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(155,127,244,.3);
+    margin-top: 8px;
+  }
+  .btn-submit:hover {
+    background: var(--purple-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(155,127,244,.42);
+  }
+  .btn-submit svg { transition: transform .2s; }
+  .btn-submit:hover svg { transform: translateX(3px); }
+
+  .trust {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    margin-top: 24px; font-size: .75rem; color: var(--muted);
+  }
+
+  .badge {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 20;
+    background: rgba(13,13,26,.85); border: 1px solid var(--border);
+    backdrop-filter: blur(12px); border-radius: 999px;
+    padding: 10px 20px; font-size: .78rem; color: var(--muted);
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 18px 20px; }
+    .card { padding: 32px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/"><span class="logo-dot"></span> MindMate</a>
+</nav>
+
+<div class="page">
+  <div class="card">
+
+    <div class="card-top">
+      <div class="logo-mark"><span></span> MindMate</div>
+      <h2>Almost there!</h2>
+      <p>One last step to complete your profile.</p>
+    </div>
+
+    <!-- Konsa provider use hua ye dikhao -->
+    <div style="text-align: center;">
+      <div class="provider-badge">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Connected with {{ account.get_provider.name }}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-box">
+      <svg width="15" height="15" fill="none" stroke="var(--purple)" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Sirf username choose karo — baaki sab Google/GitHub se aa gaya hai.
+    </div>
+
+    <!-- Form -->
+    <form method="post" action="{% url 'socialaccount_signup' %}">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="field">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <ul class="errorlist">
+              {% for error in field.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn-submit">
+        Complete Sign Up
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </form>
+
+    <div class="trust">
+      <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Always anonymous. Never judgmental. Always here.
+    </div>
+
+  </div>
+</div>
+
+<div class="badge">
+  <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+  Always anonymous. Never judgmental. Always here.
+</div>
+
+</body>
+</html>
