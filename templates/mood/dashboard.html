@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindMate — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d1a; --card: #181830; --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12); --purple: #9b7ff4; --purple-dim: #7b5fd4;
+    --purple-faint: rgba(155,127,244,.1); --green: #4ade80;
+    --green-faint: rgba(74,222,128,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #e8e8f0;
+    --muted: #8888aa; --radius: 14px;
+  }
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(80,40,180,.25) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(20,100,80,.18) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 40px; border-bottom: 1px solid var(--border); background: rgba(13,13,26,.88); backdrop-filter: blur(16px); }
+  .logo { display: flex; align-items: center; gap: 8px; font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+  .nav-center { display: flex; gap: 6px; }
+  .nav-tab { padding: 7px 16px; border-radius: 999px; font-size: .83rem; color: var(--muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; }
+  .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
+  .nav-tab.active { background: var(--purple-faint); color: var(--purple); border: 1px solid rgba(155,127,244,.3); }
+  .nav-right { display: flex; align-items: center; gap: 12px; position: relative; }
+  .notif-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: all .2s; position: relative; }
+  .notif-btn:hover { color: var(--text); border-color: var(--border2); }
+  .notif-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .user-pill { display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); cursor: pointer; transition: all .2s; user-select: none; }
+  .user-pill:hover { border-color: var(--border2); background: rgba(255,255,255,.07); }
+  .user-pill.open { border-color: rgba(155,127,244,.4); background: var(--purple-faint); }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+  .user-name { font-size: .84rem; font-weight: 500; color: var(--text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chevron { color: var(--muted); transition: transform .25s; }
+  .user-pill.open .chevron { transform: rotate(180deg); }
+  .user-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 220px; background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 8px; z-index: 200; box-shadow: 0 20px 60px rgba(0,0,0,.5); opacity: 0; transform: translateY(-8px) scale(.97); pointer-events: none; transition: all .2s cubic-bezier(.22,1,.36,1); }
+  .user-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+  .dd-header { padding: 10px 12px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .dd-avatar { font-size: 1.8rem; margin-bottom: 6px; }
+  .dd-name { font-size: .88rem; font-weight: 600; color: var(--text); }
+  .dd-email { font-size: .74rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: .84rem; color: var(--muted); cursor: pointer; text-decoration: none; transition: all .15s; }
+  .dd-item:hover { background: rgba(255,255,255,.06); color: var(--text); }
+  .dd-item.danger { color: var(--red); }
+  .dd-item.danger:hover { background: rgba(248,113,113,.08); }
+  .dd-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+  /* TOAST */
+  .toast-wrap { position: fixed; top: 80px; right: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
+  .toast { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 14px; background: var(--card); border: 1px solid var(--border2); box-shadow: 0 16px 40px rgba(0,0,0,.4); min-width: 280px; max-width: 340px; animation: toastIn .4s cubic-bezier(.22,1,.36,1) both; }
+  .toast.hiding { animation: toastOut .3s ease forwards; }
+  @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(20px)} }
+  .toast-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); }
+  .toast-body { flex: 1; }
+  .toast-title { font-size: .86rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .toast-sub { font-size: .76rem; color: var(--muted); line-height: 1.4; }
+  .toast-progress { height: 2px; background: var(--border); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+  .toast-bar { height: 100%; background: var(--purple); border-radius: 99px; }
+  .toast-close { color: var(--muted); cursor: pointer; padding: 2px; transition: color .15s; flex-shrink: 0; }
+  .toast-close:hover { color: var(--text); }
+
+  /* PAGE */
+  .page { position: relative; z-index: 5; max-width: 1200px; margin: 0 auto; padding: 36px 40px 80px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes popIn { from{opacity:0;transform:scale(.5)} to{opacity:1;transform:scale(1)} }
+
+  /* GREETING */
+  .greeting { margin-bottom: 32px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .greeting h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; margin-bottom: 4px; }
+  .greeting h1 span { color: var(--purple); font-style: italic; }
+  .greeting p { font-size: .88rem; color: var(--muted); }
+  .greeting-date strong { display: block; font-size: 1rem; color: var(--text); font-weight: 500; text-align: right; }
+  .greeting-date span { font-size: .78rem; color: var(--muted); }
+
+  /* STATS */
+  .stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+  .stat-card:nth-child(2){animation-delay:.05s}.stat-card:nth-child(3){animation-delay:.1s}.stat-card:nth-child(4){animation-delay:.15s}
+  .stat-label { font-size:.74rem; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+  .stat-icon { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .si-p{background:var(--purple-faint)}.si-g{background:var(--green-faint)}.si-a{background:rgba(251,191,36,.1)}.si-b{background:rgba(96,165,250,.1)}
+  .stat-value { font-family:'DM Serif Display',serif; font-size:2rem; color:#fff; line-height:1; margin-bottom:4px; }
+  .stat-sub { font-size:.76rem; color:var(--muted); }
+  .stat-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:.7rem; font-weight:600; background:var(--green-faint); color:var(--green); }
+
+  /* MAIN GRID */
+  .main-grid { display:grid; grid-template-columns:1fr 340px; gap:20px; }
+
+  /* CHECKIN CARD */
+  .checkin-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:32px; animation:fadeUp .5s .2s cubic-bezier(.22,1,.36,1) both; }
+  .eyebrow { font-size:.72rem; color:var(--green); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+  .pulse-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  .section-title { font-family:'DM Serif Display',serif; font-size:1.4rem; color:#fff; margin-bottom:6px; }
+  .section-sub { font-size:.84rem; color:var(--muted); margin-bottom:28px; line-height:1.6; }
+  .questions { display:flex; flex-direction:column; gap:24px; }
+  .q-label { font-size:.82rem; color:var(--text); font-weight:500; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .q-num { width:20px; height:20px; border-radius:50%; background:var(--purple-faint); border:1px solid rgba(155,127,244,.3); display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:700; color:var(--purple); flex-shrink:0; }
+  .emoji-scale { display:flex; gap:8px; }
+  .emoji-opt { flex:1; padding:10px 6px; border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,.03); display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; transition:all .2s; }
+  .emoji-opt span { font-size:.65rem; color:var(--muted); }
+  .emoji-opt:hover { border-color:rgba(155,127,244,.4); background:var(--purple-faint); }
+  .emoji-opt.selected { border-color:var(--purple); background:var(--purple-faint); }
+  .journal-input { width:100%; padding:12px 16px; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:.88rem; font-family:'DM Sans',sans-serif; outline:none; resize:vertical; min-height:80px; line-height:1.6; transition:border-color .2s; }
+  .journal-input::placeholder { color:rgba(255,255,255,.2); }
+  .journal-input:focus { border-color:var(--purple); background:rgba(155,127,244,.05); box-shadow:0 0 0 3px rgba(155,127,244,.1); }
+  .checkin-footer { margin-top:28px; }
+  .btn-submit { width:100%; padding:14px; background:var(--purple); border:none; border-radius:var(--radius); color:#fff; font-size:.95rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 20px rgba(155,127,244,.3); }
+  .btn-submit:hover { background:var(--purple-dim); transform:translateY(-2px); box-shadow:0 8px 28px rgba(155,127,244,.4); }
+
+  /* DONE STATE */
+  .done-state { display:none; text-align:center; padding:24px 0; }
+  .done-state.show { display:block; }
+  .done-check { width:64px; height:64px; border-radius:50%; background:var(--green-faint); border:2px solid var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+  .done-state h3 { font-family:'DM Serif Display',serif; font-size:1.4rem; color:#fff; margin-bottom:8px; }
+  .done-state p { font-size:.85rem; color:var(--muted); line-height:1.6; max-width:300px; margin:0 auto 20px; }
+
+  /* AI INSIGHT BOX */
+  .ai-box { background:linear-gradient(135deg,rgba(155,127,244,.07),rgba(74,222,128,.04)); border:1px solid rgba(155,127,244,.18); border-radius:14px; padding:16px 18px; margin-top:16px; }
+  .ai-box-label { font-size:.7rem; color:var(--purple); letter-spacing:.05em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .ai-box p { font-size:.83rem; color:var(--muted); line-height:1.65; margin-bottom:10px; }
+  .ai-recs { display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+  .ai-rec { display:flex; align-items:flex-start; gap:7px; font-size:.79rem; color:var(--muted); }
+  .ai-rec-dot { width:14px; height:14px; border-radius:50%; background:var(--green-faint); border:1px solid rgba(74,222,128,.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .risk-bar { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .risk-pill { padding:3px 10px; border-radius:999px; font-size:.72rem; font-weight:600; }
+  .risk-low { background:var(--green-faint); color:var(--green); border:1px solid rgba(74,222,128,.3); }
+  .risk-medium { background:rgba(251,191,36,.1); color:var(--amber); border:1px solid rgba(251,191,36,.3); }
+  .risk-high { background:rgba(248,113,113,.08); color:var(--red); border:1px solid rgba(248,113,113,.3); }
+
+  /* CHECK AGAIN BUTTON */
+  .btn-check-again { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:999px; background:rgba(255,255,255,.04); border:1px solid var(--border); color:var(--muted); font-size:.82rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+  .btn-check-again:hover { background:rgba(255,255,255,.08); color:var(--text); border-color:var(--border2); }
+
+  /* RIGHT COL */
+  .right-col { display:flex; flex-direction:column; gap:16px; }
+  .score-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:24px; text-align:center; animation:fadeUp .5s .25s cubic-bezier(.22,1,.36,1) both; }
+  .ring-wrap { position:relative; width:100px; height:100px; margin:0 auto 16px; }
+  .ring-wrap svg { transform:rotate(-90deg); }
+  .ring-bg { fill:none; stroke:var(--border2); stroke-width:8; }
+  .ring-fill { fill:none; stroke:var(--purple); stroke-width:8; stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1); }
+  .ring-val { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-val strong { font-family:'DM Serif Display',serif; font-size:1.6rem; color:#fff; line-height:1; }
+  .ring-val span { font-size:.65rem; color:var(--muted); }
+  .week-bars { display:flex; align-items:flex-end; gap:6px; height:56px; margin:16px 0 8px; }
+  .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .bar { width:100%; border-radius:4px 4px 0 0; background:var(--purple); min-height:4px; transition:height .6s cubic-bezier(.22,1,.36,1); }
+  .bar.today { background:var(--green); }
+  .bar-day { font-size:.62rem; color:var(--muted); }
+  .streak-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px; animation:fadeUp .5s .3s cubic-bezier(.22,1,.36,1) both; }
+  .streak-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .streak-num { font-family:'DM Serif Display',serif; font-size:2.4rem; color:var(--amber); line-height:1; }
+  .streak-dots { display:flex; gap:5px; flex-wrap:wrap; }
+  .streak-dot { width:26px; height:26px; border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.03); display:flex; align-items:center; justify-content:center; font-size:.65rem; color:var(--muted); }
+  .streak-dot.done { background:var(--green-faint); border-color:rgba(74,222,128,.3); color:var(--green); }
+  .streak-dot.today { background:var(--purple-faint); border-color:rgba(155,127,244,.4); color:var(--purple); }
+  .journal-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px; animation:fadeUp .5s .35s cubic-bezier(.22,1,.36,1) both; }
+  .journal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .btn-new-j { padding:6px 14px; border-radius:999px; background:var(--purple-faint); border:1px solid rgba(155,127,244,.3); color:var(--purple); font-size:.75rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; text-decoration:none; display:inline-block; }
+  .btn-new-j:hover { background:rgba(155,127,244,.2); }
+  .j-entries { display:flex; flex-direction:column; gap:10px; }
+  .j-item { padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid var(--border); cursor:pointer; transition:all .2s; }
+  .j-item:hover { background:rgba(255,255,255,.06); border-color:var(--border2); }
+  .j-item-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .j-title { font-size:.84rem; font-weight:500; color:var(--text); }
+  .j-date { font-size:.7rem; color:var(--muted); }
+  .j-preview { font-size:.76rem; color:var(--muted); line-height:1.5; }
+  .mood-tag { display:inline-flex; padding:2px 8px; border-radius:999px; font-size:.65rem; font-weight:600; margin-top:6px; }
+  .mood-tag.grateful{background:var(--green-faint);color:var(--green)}.mood-tag.anxious{background:rgba(251,191,36,.1);color:var(--amber)}.mood-tag.calm{background:rgba(96,165,250,.1);color:var(--blue)}
+
+  /* CHAT TRIGGER */
+  .chat-trigger { position:fixed; bottom:32px; right:28px; z-index:300; width:52px; height:52px; border-radius:50%; background:var(--purple); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(155,127,244,.4); transition:all .25s cubic-bezier(.22,1,.36,1); animation:popIn .5s 1.5s cubic-bezier(.34,1.56,.64,1) both; }
+  .chat-trigger:hover { transform:scale(1.1); }
+  .chat-trigger.open { background:var(--purple-dim); }
+  .chat-trigger .chat-icon { transition:all .2s; }
+  .chat-trigger.open .chat-icon { display:none; }
+  .chat-trigger .close-icon { display:none; }
+  .chat-trigger.open .close-icon { display:flex; }
+  .chat-unread { position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%; background:var(--green); border:2px solid var(--bg); font-size:.55rem; font-weight:700; color:#0d0d1a; display:flex; align-items:center; justify-content:center; animation:pulse 2s infinite; }
+  .chat-unread.hidden { display:none; }
+
+  /* CHAT PANEL */
+  .chat-panel { position:fixed; bottom:90px; right:28px; z-index:299; width:360px; height:min(520px, calc(100vh - 110px)); max-height: calc(100vh - 110px); background:var(--card); border:1px solid var(--border2); border-radius:24px; box-shadow:0 24px 64px rgba(0,0,0,.6); display:flex; flex-direction:column; opacity:0; transform:translateY(16px) scale(.97); pointer-events:none; transition:all .3s cubic-bezier(.22,1,.36,1); overflow:hidden; }
+  .chat-panel.open { opacity:1; transform:translateY(0) scale(1); pointer-events:all; }
+  .chat-header { padding:16px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; background:rgba(155,127,244,.05); }
+  .ch-avatar { width:36px; height:36px; border-radius:50%; background:var(--purple-faint); border:1px solid rgba(155,127,244,.3); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+  .ch-name { font-size:.88rem; font-weight:600; color:var(--text); }
+  .ch-status { font-size:.7rem; color:var(--green); display:flex; align-items:center; gap:4px; }
+  .ch-status::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); }
+  .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth; }
+  .chat-messages::-webkit-scrollbar { width:4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background:var(--border2); border-radius:99px; }
+  .msg { display:flex; flex-direction:column; max-width:85%; animation:fadeUp .3s cubic-bezier(.22,1,.36,1) both; }
+  .msg.bot { align-self:flex-start; }
+  .msg.user { align-self:flex-end; }
+  .msg-bubble { padding:10px 14px; border-radius:16px; font-size:.84rem; line-height:1.6; }
+  .msg.bot .msg-bubble { background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:4px; }
+  .msg.user .msg-bubble { background:var(--purple); color:#fff; border-bottom-right-radius:4px; }
+  .msg-time { font-size:.62rem; color:var(--muted); margin-top:3px; padding:0 4px; }
+  .msg.user .msg-time { text-align:right; }
+  .typing-indicator { display:none; align-self:flex-start; }
+  .typing-indicator.show { display:flex; }
+  .typing-bubble { background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:16px; border-bottom-left-radius:4px; padding:10px 14px; display:flex; gap:4px; align-items:center; }
+  .typing-dot { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:typeDot 1.2s infinite; }
+  .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes typeDot { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+  .quick-replies { display:flex; gap:6px; flex-wrap:wrap; padding:0 16px 10px; flex-shrink:0; }
+  .quick-reply { padding:5px 12px; border-radius:999px; font-size:.74rem; border:1px solid rgba(155,127,244,.3); background:var(--purple-faint); color:var(--purple); cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+  .quick-reply:hover { background:rgba(155,127,244,.2); }
+  .chat-input-row { padding:12px 14px; border-top:1px solid var(--border); display:flex; align-items:flex-end; gap:8px; flex-shrink:0; }
+  .chat-input { flex:1; padding:10px 14px; background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:.86rem; font-family:'DM Sans',sans-serif; outline:none; resize:none; max-height:100px; min-height:40px; line-height:1.5; transition:border-color .2s; }
+  .chat-input::placeholder { color:rgba(255,255,255,.25); }
+  .chat-input:focus { border-color:rgba(155,127,244,.4); }
+  .chat-send { width:38px; height:38px; border-radius:10px; flex-shrink:0; background:var(--purple); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s,transform .15s; }
+  .chat-send:hover { background:var(--purple-dim); transform:scale(1.05); }
+  .chat-send:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .chat-disclaimer { text-align:center; font-size:.64rem; color:rgba(136,136,170,.35); padding:6px 16px 10px; flex-shrink:0; }
+
+  /* BADGE */
+  .badge { position:fixed; bottom:24px; left:24px; transform:none; z-index:20; background:rgba(13,13,26,.85); border:1px solid var(--border); backdrop-filter:blur(12px); border-radius:999px; padding:10px 20px; font-size:.78rem; color:var(--muted); display:flex; align-items:center; gap:8px; white-space:nowrap; }
+
+  @media(max-width:960px){
+    .main-grid{grid-template-columns:1fr}
+    .stat-strip{grid-template-columns:1fr 1fr}
+    nav{padding:14px 20px}
+    .nav-center{display:none}
+    .page{padding:24px 20px 80px}
+    .greeting{flex-direction:column;align-items:flex-start;gap:4px}
+    .user-name{display:none}
+    .chat-panel{width:calc(100vw - 24px);right:12px}
+    .chat-trigger{right:16px}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span> MindMate</a>
+  <div class="nav-center">
+    <a href="{% url 'userboard' %}" class="nav-tab active">Dashboard</a>
+    <a href="{% url 'journal_new' %}" class="nav-tab">Journal</a>
+    <a href="{% url 'profile_view' %}" class="nav-tab">Progress</a>
+    <a href="#" class="nav-tab">Resources</a>
+  </div>
+  <div class="nav-right">
+    <div class="notif-btn">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="user-pill" id="user-pill" onclick="toggleDropdown()">
+      <div class="user-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+      <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="user-dropdown" id="user-dropdown">
+      <div class="dd-header">
+        <div class="dd-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+        <div class="dd-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="dd-email">{{ request.user.email }}</div>
+      </div>
+      <a href="{% url 'profile_view' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>View Profile</a>
+      <a href="{% url 'profile_edit' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Profile</a>
+      <a href="{% url 'password_change' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Change Password</a>
+      <a href="{% url 'settings' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
+      <div class="dd-divider"></div>
+      <a href="{% url 'logout' %}" class="dd-item danger"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <div>
+      <h1>Good <span id="time-greeting">morning</span>, <span>{{ request.user.first_name|default:request.user.username }}</span> 👋</h1>
+      <p>How are you feeling today? Your check-in takes less than 2 minutes.</p>
+    </div>
+    <div class="greeting-date">
+      <strong id="today-date"></strong>
+      <span id="today-time"></span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-strip">
+    <div class="stat-card">
+      <div class="stat-label"><div class="stat-icon si-p"><svg width="10" height="10" fill="none" stroke="var(--purple)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>Health Score</div>
+      <div class="stat-value">{{ latest_score|default:"—" }}</div>
+      <div class="stat-sub">out of 100 {% if latest_score %}<span class="stat-badge">↑ improving</span>{% endif %}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><div class="stat-icon si-a" style="font-size:.8rem">🔥</div>Streak</div>
+      <div class="stat-value">{{ streak|default:"0" }}</div>
+      <div class="stat-sub">days in a row</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><div class="stat-icon si-g"><svg width="10" height="10" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Check-ins</div>
+      <div class="stat-value">{{ total_checkins|default:"0" }}</div>
+      <div class="stat-sub">since you joined</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><div class="stat-icon si-b"><svg width="10" height="10" fill="none" stroke="var(--blue)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>Journal</div>
+      <div class="stat-value">{{ journal_count|default:"0" }}</div>
+      <div class="stat-sub">entries written</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- CHECK-IN CARD -->
+    <div class="checkin-card">
+
+      <!-- CHECK-IN FORM -->
+      <div id="checkin-form" {% if already_checked_in %}style="display:none"{% endif %}>
+        <div class="eyebrow"><div class="pulse-dot"></div> Daily Check-in</div>
+        <div class="section-title">How are you doing today?</div>
+        <div class="section-sub">5 quick questions. Private and anonymous.</div>
+        <form method="POST" action="{% url 'checkin' %}">
+          {% csrf_token %}
+          <div class="questions">
+            <div>
+              <div class="q-label"><div class="q-num">1</div> How's your mood?</div>
+              <div class="emoji-scale">
+                <div class="emoji-opt" onclick="sel(this,'mood_score','1')"><span style="font-size:1.4rem">😔</span><span>Very Low</span><input type="radio" name="mood_score" value="1" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'mood_score','2')"><span style="font-size:1.4rem">😕</span><span>Low</span><input type="radio" name="mood_score" value="2" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'mood_score','3')"><span style="font-size:1.4rem">😐</span><span>Neutral</span><input type="radio" name="mood_score" value="3" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'mood_score','4')"><span style="font-size:1.4rem">🙂</span><span>Good</span><input type="radio" name="mood_score" value="4" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'mood_score','5')"><span style="font-size:1.4rem">😊</span><span>Great</span><input type="radio" name="mood_score" value="5" style="display:none"/></div>
+              </div>
+            </div>
+            <div>
+              <div class="q-label"><div class="q-num">2</div> Sleep last night?</div>
+              <div class="emoji-scale">
+                <div class="emoji-opt" onclick="sel(this,'sleep_score','1')"><span style="font-size:1.4rem">😵</span><span>&lt;4 hrs</span><input type="radio" name="sleep_score" value="1" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'sleep_score','2')"><span style="font-size:1.4rem">😪</span><span>4-6 hrs</span><input type="radio" name="sleep_score" value="2" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'sleep_score','3')"><span style="font-size:1.4rem">😴</span><span>6-7 hrs</span><input type="radio" name="sleep_score" value="3" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'sleep_score','4')"><span style="font-size:1.4rem">😌</span><span>7-8 hrs</span><input type="radio" name="sleep_score" value="4" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'sleep_score','5')"><span style="font-size:1.4rem">🌟</span><span>8+ hrs</span><input type="radio" name="sleep_score" value="5" style="display:none"/></div>
+              </div>
+            </div>
+            <div>
+              <div class="q-label"><div class="q-num">3</div> Stress level?</div>
+              <div class="emoji-scale">
+                <div class="emoji-opt" onclick="sel(this,'stress_score','1')"><span style="font-size:1.4rem">🤯</span><span>Very High</span><input type="radio" name="stress_score" value="1" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'stress_score','2')"><span style="font-size:1.4rem">😰</span><span>High</span><input type="radio" name="stress_score" value="2" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'stress_score','3')"><span style="font-size:1.4rem">😤</span><span>Moderate</span><input type="radio" name="stress_score" value="3" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'stress_score','4')"><span style="font-size:1.4rem">😊</span><span>Low</span><input type="radio" name="stress_score" value="4" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'stress_score','5')"><span style="font-size:1.4rem">😎</span><span>None</span><input type="radio" name="stress_score" value="5" style="display:none"/></div>
+              </div>
+            </div>
+            <div>
+              <div class="q-label"><div class="q-num">4</div> Social connection?</div>
+              <div class="emoji-scale">
+                <div class="emoji-opt" onclick="sel(this,'social_score','1')"><span style="font-size:1.4rem">🫥</span><span>Isolated</span><input type="radio" name="social_score" value="1" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'social_score','2')"><span style="font-size:1.4rem">😶</span><span>Somewhat</span><input type="radio" name="social_score" value="2" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'social_score','3')"><span style="font-size:1.4rem">🙂</span><span>Neutral</span><input type="radio" name="social_score" value="3" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'social_score','4')"><span style="font-size:1.4rem">😄</span><span>Connected</span><input type="radio" name="social_score" value="4" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'social_score','5')"><span style="font-size:1.4rem">🤗</span><span>Very much</span><input type="radio" name="social_score" value="5" style="display:none"/></div>
+              </div>
+            </div>
+            <div>
+              <div class="q-label"><div class="q-num">5</div> Energy today?</div>
+              <div class="emoji-scale">
+                <div class="emoji-opt" onclick="sel(this,'energy_score','1')"><span style="font-size:1.4rem">🪫</span><span>Exhausted</span><input type="radio" name="energy_score" value="1" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'energy_score','2')"><span style="font-size:1.4rem">😩</span><span>Tired</span><input type="radio" name="energy_score" value="2" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'energy_score','3')"><span style="font-size:1.4rem">😐</span><span>Okay</span><input type="radio" name="energy_score" value="3" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'energy_score','4')"><span style="font-size:1.4rem">⚡</span><span>Energised</span><input type="radio" name="energy_score" value="4" style="display:none"/></div>
+                <div class="emoji-opt" onclick="sel(this,'energy_score','5')"><span style="font-size:1.4rem">🔋</span><span>Very much</span><input type="radio" name="energy_score" value="5" style="display:none"/></div>
+              </div>
+            </div>
+            <div>
+              <div class="q-label"><div class="q-num" style="background:rgba(255,255,255,.05);border-color:var(--border);color:var(--muted)">+</div> Anything on your mind? <span style="font-size:.74rem;color:var(--muted);font-weight:400">(optional)</span></div>
+              <textarea class="journal-input" name="mood_note" placeholder="A sentence or two about how you're feeling..."></textarea>
+            </div>
+          </div>
+          <div class="checkin-footer">
+            <button type="submit" class="btn-submit">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Save today's check-in
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- DONE STATE -->
+      <div class="done-state {% if already_checked_in %}show{% endif %}" id="done-state">
+        <div class="done-check">
+          <svg width="28" height="28" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>You've checked in today 🎉</h3>
+        <p>Great job. Come back tomorrow to keep your streak going.</p>
+
+        <!-- AI INSIGHT -->
+        {% if ai_data %}
+        <div class="ai-box" style="text-align:left">
+          <div class="ai-box-label">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            MindMate AI Insight
+          </div>
+          <div class="risk-bar">
+            <div class="risk-pill risk-{{ ai_data.risk_level|default:'low' }}">
+              {% if ai_data.risk_level == 'high' %}⚠ High risk{% elif ai_data.risk_level == 'medium' %}~ Medium{% else %}✓ Low risk{% endif %}
+            </div>
+            {% if ai_data.risk_reason %}<span style="font-size:.76rem;color:var(--muted)">{{ ai_data.risk_reason }}</span>{% endif %}
+          </div>
+          <p>{{ ai_data.insight }}</p>
+          {% if ai_data.recommendations %}
+          <div class="ai-box-label" style="margin-top:4px">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>
+            Recommendations
+          </div>
+          <div class="ai-recs">
+            {% for rec in ai_data.recommendations %}
+            <div class="ai-rec">
+              <div class="ai-rec-dot"><svg width="7" height="7" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              {{ rec }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- CHECK AGAIN -->
+        <form method="POST" action="{% url 'checkin_again' %}" style="margin-top:16px">
+          {% csrf_token %}
+          <button type="submit" class="btn-check-again">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+            Check in again
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div class="right-col">
+      <div class="score-card">
+        <div class="eyebrow" style="justify-content:center">Weekly Score</div>
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="45"/>
+            <circle class="ring-fill" id="score-ring" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="ring-val"><strong>{{ weekly_score|default:"—" }}</strong><span>/100</span></div>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px">Mental health score</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--green)">{{ score_status }}</div>
+        <div class="week-bars" id="week-bars">
+          <div class="bar-col"><div class="bar" id="b0" style="height:4px"></div><span class="bar-day">M</span></div>
+          <div class="bar-col"><div class="bar" id="b1" style="height:4px"></div><span class="bar-day">T</span></div>
+          <div class="bar-col"><div class="bar" id="b2" style="height:4px"></div><span class="bar-day">W</span></div>
+          <div class="bar-col"><div class="bar" id="b3" style="height:4px"></div><span class="bar-day">T</span></div>
+          <div class="bar-col"><div class="bar" id="b4" style="height:4px"></div><span class="bar-day">F</span></div>
+          <div class="bar-col"><div class="bar" id="b5" style="height:4px"></div><span class="bar-day">S</span></div>
+          <div class="bar-col"><div class="bar today" id="b6" style="height:4px"></div><span class="bar-day" style="color:var(--green)">S</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)">
+          <span>This week</span>
+          <a href="{% url 'profile_view' %}" style="color:var(--purple);text-decoration:none;font-size:.7rem">View history →</a>
+        </div>
+      </div>
+
+      <div class="streak-card">
+        <div class="eyebrow">🔥 Streak</div>
+        <div class="streak-row">
+          <div><div class="streak-num">{{ streak|default:"0" }}</div><div style="font-size:.78rem;color:var(--muted)">days in a row</div></div>
+          <div style="text-align:right"><div style="font-size:.76rem;color:var(--muted)">Best</div><div style="font-size:1.1rem;font-weight:600;color:var(--text)">{{ longest_streak|default:"0" }} days</div></div>
+        </div>
+        <div class="streak-dots" id="streak-dots"></div>
+      </div>
+
+      <div class="journal-card">
+        <div class="journal-header">
+          <div class="eyebrow">📓 Journal</div>
+          <a href="{% url 'journal_new' %}" class="btn-new-j">+ New Entry</a>
+        </div>
+        <div class="j-entries">
+          {% for entry in recent_journals %}
+          <div class="j-item">
+            <div class="j-item-top">
+              <div class="j-title">{{ entry.title|default:"Untitled" }}</div>
+              <div class="j-date">{{ entry.created_at|date:"d M" }}</div>
+            </div>
+            <div class="j-preview">{{ entry.content|truncatechars:80 }}</div>
+            {% if entry.mood_tag %}<div class="mood-tag {{ entry.mood_tag }}">{{ entry.mood_tag }}</div>{% endif %}
+          </div>
+          {% empty %}
+          <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:.84rem">
+            No entries yet.<br>
+            <a href="{% url 'journal_new' %}" style="color:var(--purple);text-decoration:none">Write your first one →</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT TRIGGER -->
+<button class="chat-trigger" id="chat-trigger" onclick="toggleChat()">
+  <div class="chat-unread hidden" id="chat-unread">1</div>
+  <span class="chat-icon"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+  <span class="close-icon"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+</button>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <div class="ch-avatar">🧠</div>
+    <div style="flex:1">
+      <div class="ch-name">MindMate AI</div>
+      <div class="ch-status">Here for you</div>
+    </div>
+    <svg width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24" style="cursor:pointer" onclick="toggleChat()"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="typing-indicator" id="typing-indicator">
+    <div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+  </div>
+  <div class="quick-replies" id="quick-replies"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-send" id="chat-send" onclick="sendMessage()">
+      <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div class="chat-disclaimer">Not a substitute for professional help · Always confidential</div>
+</div>
+
+<div class="badge">
+  <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Always anonymous. Never judgmental. Always here.
+</div>
+
+<script>
+  // ── DROPDOWN ──
+  document.addEventListener('click', function(e) {
+    const pill = document.getElementById('user-pill');
+    const dd = document.getElementById('user-dropdown');
+    if (!pill.contains(e.target) && !dd.contains(e.target)) {
+      pill.classList.remove('open');
+      dd.classList.remove('open');
+    }
+  });
+  function toggleDropdown() {
+    document.getElementById('user-pill').classList.toggle('open');
+    document.getElementById('user-dropdown').classList.toggle('open');
+  }
+
+  // ── TOAST ──
+  function showToast(icon, title, sub, dur=4000) {
+    const wrap = document.getElementById('toast-wrap');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div><div class="toast-progress"><div class="toast-bar" style="animation:shrink ${dur}ms linear forwards"></div></div></div><div class="toast-close" onclick="dismissToast(this)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`;
+    wrap.appendChild(t);
+    setTimeout(() => dismissToast(t.querySelector('.toast-close')), dur);
+  }
+  function dismissToast(btn) {
+    const t = btn.closest('.toast');
+    if (!t) return;
+    t.classList.add('hiding');
+    setTimeout(() => t.remove(), 300);
+  }
+
+  // ── WELCOME TOAST ──
+  const userName = "{{ request.user.first_name|default:request.user.username }}";
+  const sessionKey = 'mm_welcomed_{{ request.user.id }}';
+  if (!sessionStorage.getItem(sessionKey)) {
+    setTimeout(() => {
+      showToast('👋', `Welcome back, ${userName}!`, "Great to see you. Ready for today's check-in?", 5000);
+      sessionStorage.setItem(sessionKey, '1');
+    }, 800);
+  }
+
+  // ── DATE & GREETING ──
+  const now = new Date();
+  const h = now.getHours();
+  document.getElementById('time-greeting').textContent = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  document.getElementById('today-date').textContent = now.toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('today-time').textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+
+  // ── SCORE RING ──
+  const sc = parseInt('{{ weekly_score|default:0 }}') || 0;
+  setTimeout(() => { document.getElementById('score-ring').style.strokeDashoffset = 283 - (sc/100)*283; }, 300);
+
+  // ── STREAK DOTS ──
+  const streak = parseInt('{{ streak|default:0 }}') || 0;
+  const dotsEl = document.getElementById('streak-dots');
+  ['M','T','W','T','F','S','S'].forEach((d,i) => {
+    const dot = document.createElement('div');
+    const ds = (now.getDay()-1-i+7)%7;
+    dot.className = 'streak-dot' + (ds===0?' today':ds<streak?' done':'');
+    dot.textContent = ds<=streak?'✓':d;
+    dotsEl.appendChild(dot);
+  });
+
+  // ── WEEK BARS ──
+  const barHeights = [30,44,36,50,28,40,48];
+  barHeights.forEach((h,i) => {
+    setTimeout(() => { document.getElementById('b'+i).style.height = h+'px'; }, 400+i*60);
+  });
+
+  // ── EMOJI SELECTOR ──
+  function sel(el, name) {
+    document.querySelectorAll(`[onclick*="'${name}'"]`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+  }
+
+  // ── CHAT ──
+  let chatOpen = false;
+  let chatHistory = [];
+  let isBusy = false;
+  const moodScore = parseInt('{{ latest_checkin_mood|default:3 }}') || 3;
+  const checkinDone = '{{ already_checked_in|yesno:"true,false" }}' === 'true';
+
+  function getOpening() {
+    if (!checkinDone) return `Hey ${userName} 👋 Complete your check-in first and I'll be ready to chat with you.`;
+    if (moodScore <= 2) return `Hey ${userName} 💙 I can see today has been tough. I'm really glad you checked in. No pressure, no judgement — how are you feeling right now?`;
+    if (moodScore === 3) return `Hey ${userName} 👋 Thanks for checking in. Sounds like things are okay but maybe not quite right. Want to talk about what's on your mind?`;
+    return `Hey ${userName} ✨ Looks like you're having a good day — that's wonderful! What's been lifting your spirits today?`;
+  }
+
+  function initChat() {
+    const opening = getOpening();
+    appendMsg('bot', opening);
+    chatHistory.push({role:'assistant', content:opening});
+    const qr = document.getElementById('quick-replies');
+    if (moodScore <= 2) {
+      qr.innerHTML = `<button class="quick-reply" onclick="sendQuick(this)">I'm overwhelmed</button><button class="quick-reply" onclick="sendQuick(this)">I feel alone</button><button class="quick-reply" onclick="sendQuick(this)">I don't know</button>`;
+    } else if (moodScore === 3) {
+      qr.innerHTML = `<button class="quick-reply" onclick="sendQuick(this)">I'm a bit stressed</button><button class="quick-reply" onclick="sendQuick(this)">It's complicated</button><button class="quick-reply" onclick="sendQuick(this)">Tell me something helpful</button>`;
+    } else {
+      qr.innerHTML = `<button class="quick-reply" onclick="sendQuick(this)">I had a great day</button><button class="quick-reply" onclick="sendQuick(this)">How do I keep this up?</button><button class="quick-reply" onclick="sendQuick(this)">I'm grateful today</button>`;
+    }
+  }
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    document.getElementById('chat-trigger').classList.toggle('open', chatOpen);
+    document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+    document.getElementById('chat-unread').classList.add('hidden');
+    if (chatOpen) setTimeout(() => document.getElementById('chat-input').focus(), 300);
+    scrollBottom();
+  }
+
+  function appendMsg(role, text) {
+    const wrap = document.getElementById('chat-messages');
+    const m = document.createElement('div');
+    m.className = `msg ${role}`;
+    const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+    m.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${time}</div>`;
+    wrap.appendChild(m);
+    scrollBottom();
+  }
+
+  function scrollBottom() {
+    const w = document.getElementById('chat-messages');
+    setTimeout(() => w.scrollTop = w.scrollHeight, 50);
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || isBusy) return;
+    input.value = '';
+    autoResize(input);
+    document.getElementById('quick-replies').style.display = 'none';
+    appendMsg('user', text);
+    chatHistory.push({role:'user', content:text});
+    isBusy = true;
+    document.getElementById('chat-send').disabled = true;
+    document.getElementById('typing-indicator').classList.add('show');
+    scrollBottom();
+    try {
+      const res = await fetch("{% url 'chat' %}", {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+        body: JSON.stringify({user_message:text, messages:chatHistory.slice(0,-1)})
+      });
+      const data = await res.json();
+      const reply = data.reply || "I'm here. Could you tell me a little more?";
+      document.getElementById('typing-indicator').classList.remove('show');
+      appendMsg('bot', reply);
+      chatHistory.push({role:'assistant', content:reply});
+    } catch(e) {
+      document.getElementById('typing-indicator').classList.remove('show');
+      appendMsg('bot', "I'm here with you. There was a small hiccup — could you say that again?");
+    }
+    isBusy = false;
+    document.getElementById('chat-send').disabled = false;
+    document.getElementById('chat-input').focus();
+  }
+
+  function sendQuick(btn) {
+    document.getElementById('chat-input').value = btn.textContent;
+    sendMessage();
+  }
+
+  function handleKey(e) {
+    if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight,100)+'px';
+  }
+
+  function getCookie(name) {
+    const v = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(name+'='));
+    return v ? decodeURIComponent(v.split('=')[1]) : '';
+  }
+
+  // init chat + show bubble after checkin
+  initChat();
+  if (checkinDone) {
+    setTimeout(() => document.getElementById('chat-unread').classList.remove('hidden'), 3000);
+  }
+</script>
+</body>
+</html>

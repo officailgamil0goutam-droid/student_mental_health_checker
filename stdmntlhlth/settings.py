@@ -49,14 +49,14 @@ INSTALLED_APPS = [
     
 ]
 
-SITE_ID = 1
+SITE_ID = 6
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-LOGIN_REDIRECT_URL = '/'
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
@@ -146,17 +146,40 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-LOGIN_REDIRECT_URL = '/mood/check/'
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/login/'
+# showing the actual error
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+
+# Allow allauth to redirect to the register page with query params
+LOGIN_REDIRECT_URL = '/accounts/register/?social=true&provider=Google'
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your@gmail.com'        # your gmail
-EMAIL_HOST_PASSWORD = 'your_app_password' # gmail app password
-DEFAULT_FROM_EMAIL = 'your@gmail.com'
+from decouple import config
+GEMINI_API_KEY = config('GEMINI_API_KEY')
+AI_PROVIDER = config('AI_PROVIDER', default='dummy')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
+
+
 
 # Allauth Settings
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# Allow Google login to connect to existing accounts
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Don't show the intermediate "confirm" page
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_ADAPTER = 'accounts.adapters.AccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'accounts.adapters.SocialAccountAdapter'
+
+
+
+import logging
+logger = logging.getLogger('django')
+

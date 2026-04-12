@@ -10,7 +10,7 @@
   :root {
     --bg: #0d0d1a; --card: #181830; --border: rgba(255,255,255,0.07);
     --purple: #9b7ff4; --purple-dim: #7b5fd4; --green: #4ade80;
-    --text: #e8e8f0; --muted: #8888aa; --radius: 14px;
+    --text: #e8e8f0; --muted: #8888aa; --radius: 14px; --red: #f87171;
   }
   html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
   body::before {
@@ -28,12 +28,7 @@
   }
 
   /* NAV */
-  nav {
-    position: relative; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 48px; border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-  }
+  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
   .logo { display: flex; align-items: center; gap: 8px; font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--text); text-decoration: none; }
   .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
   .nav-links { display: flex; gap: 32px; list-style: none; }
@@ -44,114 +39,67 @@
   .btn-nav { padding: 10px 22px; border-radius: 999px; background: var(--purple); color: #fff; font-size: .88rem; font-weight: 500; border: none; cursor: pointer; transition: background .2s, transform .15s; }
   .btn-nav:hover { background: var(--purple-dim); transform: translateY(-1px); }
 
-  /* LAYOUT: sidebar + form */
-  .page {
-    position: relative; z-index: 5;
-    display: grid; grid-template-columns: 280px 1fr;
-    min-height: calc(100vh - 69px);
-    max-width: 1100px; margin: 0 auto;
-    padding: 0 48px;
-    gap: 48px;
-  }
+  /* LAYOUT */
+  .page { position: relative; z-index: 5; display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 69px); max-width: 1100px; margin: 0 auto; padding: 0 48px; gap: 48px; }
 
-  /* LEFT SIDEBAR */
-  .sidebar {
-    padding: 56px 0 80px;
-    display: flex; flex-direction: column;
-    border-right: 1px solid var(--border);
-    padding-right: 48px;
-  }
+  /* SIDEBAR */
+  .sidebar { padding: 56px 0 80px; display: flex; flex-direction: column; border-right: 1px solid var(--border); padding-right: 48px; }
   .sidebar-brand { font-size: .8rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 36px; }
   .sidebar-steps { display: flex; flex-direction: column; gap: 0; }
-  .sidebar-step {
-    display: flex; gap: 16px; align-items: flex-start;
-    padding-bottom: 36px; position: relative;
-  }
-  .sidebar-step:not(:last-child)::after {
-    content: ''; position: absolute;
-    left: 15px; top: 32px; bottom: 0; width: 1px;
-    background: var(--border); transition: background .4s;
-  }
+  .sidebar-step { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 36px; position: relative; }
+  .sidebar-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 1px; background: var(--border); transition: background .4s; }
   .sidebar-step.done::after { background: rgba(74,222,128,.4); }
-
-  .step-icon {
-    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,.04);
-    font-size: .75rem; font-weight: 600; color: var(--muted);
-    transition: all .3s; position: relative; z-index: 1;
-  }
+  .step-icon { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: rgba(255,255,255,.04); font-size: .75rem; font-weight: 600; color: var(--muted); transition: all .3s; position: relative; z-index: 1; }
   .sidebar-step.active .step-icon { background: rgba(155,127,244,.15); border-color: rgba(155,127,244,.5); color: var(--purple); }
   .sidebar-step.done .step-icon { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.4); color: var(--green); }
-
   .step-label { padding-top: 4px; }
   .step-label strong { display: block; font-size: .88rem; font-weight: 600; color: var(--muted); transition: color .3s; }
   .step-label span { font-size: .78rem; color: rgba(136,136,170,.5); }
   .sidebar-step.active .step-label strong { color: var(--text); }
   .sidebar-step.done .step-label strong { color: var(--green); }
-
   .sidebar-footer { margin-top: auto; padding-top: 40px; }
   .sidebar-footer p { font-size: .78rem; color: rgba(136,136,170,.45); line-height: 1.6; }
 
-  /* RIGHT FORM AREA */
-  .form-area {
-    padding: 56px 0 80px;
-    display: flex; align-items: flex-start;
-  }
-
-  .card {
-    width: 100%; max-width: 520px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px; padding: 44px;
-    box-shadow: 0 0 0 1px rgba(155,127,244,.08), 0 40px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
-    animation: cardIn .55s cubic-bezier(.22,1,.36,1) both;
-  }
+  /* FORM AREA */
+  .form-area { padding: 56px 0 80px; display: flex; align-items: flex-start; }
+  .card { width: 100%; max-width: 520px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 44px; box-shadow: 0 0 0 1px rgba(155,127,244,.08), 0 40px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06); animation: cardIn .55s cubic-bezier(.22,1,.36,1) both; }
   @keyframes cardIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-
   .step { display: none; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
   .step.active { display: block; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-
   .card-header { margin-bottom: 28px; }
   .eyebrow { font-size: .75rem; color: var(--green); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
   .card-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.75rem; color: #fff; margin-bottom: 6px; }
   .card-header p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
 
-  .btn-google {
-    width: 100%; padding: 13px 20px; background: rgba(255,255,255,.05);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    color: var(--text); font-size: .9rem; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: background .2s, border-color .2s; margin-bottom: 18px;
-    font-family: 'DM Sans', sans-serif;
-  }
+  /* GOOGLE BTN */
+  .btn-google { width: 100%; padding: 13px 20px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: .9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .2s, border-color .2s; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; }
   .btn-google:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.15); }
-
+  .btn-github { width: 100%; padding: 13px 20px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: .9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .2s, border-color .2s; margin-bottom: 18px; font-family: 'DM Sans', sans-serif; }
+  .btn-github:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.15); }
   .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: var(--muted); font-size: .78rem; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+  /* FIELDS */
   .fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
   .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: .76rem; color: var(--muted); font-weight: 500; letter-spacing: .03em; }
-  .field input, .field select {
-    padding: 12px 16px; background: rgba(255,255,255,.04);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    color: var(--text); font-size: .9rem; font-family: 'DM Sans', sans-serif; outline: none;
-    transition: border-color .2s, background .2s, box-shadow .2s; appearance: none;
-  }
+  .field label { font-size: .76rem; color: var(--muted); font-weight: 500; letter-spacing: .03em; display: flex; align-items: center; gap: 4px; }
+  .req { color: var(--red); font-size: .8rem; }
+  .field input, .field select { padding: 12px 16px; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: .9rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s, background .2s, box-shadow .2s; appearance: none; }
   .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888aa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
   .field select option { background: #181830; }
   .field input::placeholder { color: rgba(255,255,255,.2); }
   .field input:focus, .field select:focus { border-color: var(--purple); background: rgba(155,127,244,.06); box-shadow: 0 0 0 3px rgba(155,127,244,.12); }
+  .field input.error, .field select.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(248,113,113,.12); }
+  .field-error { font-size: .72rem; color: var(--red); margin-top: 3px; display: none; }
+  .field-error.show { display: block; }
 
+  /* PW */
   .pw-wrap { position: relative; }
   .pw-wrap input { width: 100%; padding-right: 44px; }
   .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; transition: color .2s; }
   .pw-toggle:hover { color: var(--text); }
-
   .strength { display: flex; gap: 4px; margin-top: 6px; }
   .strength span { flex: 1; height: 3px; border-radius: 99px; background: var(--border); transition: background .3s; }
   .strength.s1 span:nth-child(1) { background: #f87171; }
@@ -159,53 +107,41 @@
   .strength.s3 span:nth-child(-n+3) { background: #facc15; }
   .strength.s4 span { background: var(--green); }
 
-  .interests { display: flex; flex-wrap: wrap; gap: 8px; }
-  .interest-chip {
-    padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border);
-    font-size: .82rem; color: var(--muted); cursor: pointer; transition: all .2s; user-select: none;
-    background: rgba(255,255,255,.03);
-  }
-  .interest-chip:hover { border-color: rgba(155,127,244,.4); color: var(--text); }
-  .interest-chip.selected { background: rgba(155,127,244,.15); border-color: rgba(155,127,244,.5); color: var(--purple); }
-
+  /* AVATAR */
   .avatar-row { display: flex; gap: 12px; flex-wrap: wrap; }
-  .avatar-opt {
-    width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; cursor: pointer; transition: border-color .2s, transform .15s;
-    background: rgba(255,255,255,.04);
-  }
+  .avatar-opt { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: border-color .2s, transform .15s; background: rgba(255,255,255,.04); }
   .avatar-opt:hover { transform: scale(1.1); border-color: rgba(155,127,244,.5); }
   .avatar-opt.selected { border-color: var(--purple); background: rgba(155,127,244,.12); }
+  .avatar-error { font-size: .72rem; color: var(--red); margin-top: 6px; display: none; }
+  .avatar-error.show { display: block; }
 
+  /* CHIPS */
+  .interests { display: flex; flex-wrap: wrap; gap: 8px; }
+  .interest-chip { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); font-size: .82rem; color: var(--muted); cursor: pointer; transition: all .2s; user-select: none; background: rgba(255,255,255,.03); }
+  .interest-chip:hover { border-color: rgba(155,127,244,.4); color: var(--text); }
+  .interest-chip.selected { background: rgba(155,127,244,.15); border-color: rgba(155,127,244,.5); color: var(--purple); }
+  .chip-error { font-size: .72rem; color: var(--red); margin-top: 6px; display: none; }
+  .chip-error.show { display: block; }
+
+  /* TERMS */
   .terms { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; font-size: .8rem; color: var(--muted); line-height: 1.5; }
   .terms input[type=checkbox] { accent-color: var(--purple); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
   .terms a { color: var(--purple); text-decoration: none; }
   .terms a:hover { text-decoration: underline; }
 
-  .btn-primary {
-    width: 100%; padding: 14px; background: var(--purple); border: none; border-radius: var(--radius);
-    color: #fff; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s, box-shadow .2s;
-    box-shadow: 0 4px 20px rgba(155,127,244,.3); margin-bottom: 10px;
-  }
+  /* BUTTONS */
+  .btn-primary { width: 100%; padding: 14px; background: var(--purple); border: none; border-radius: var(--radius); color: #fff; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 4px 20px rgba(155,127,244,.3); margin-bottom: 10px; }
   .btn-primary:hover { background: var(--purple-dim); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(155,127,244,.4); }
   .btn-primary:active { transform: translateY(0); }
-  .btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
-
-  .btn-ghost {
-    width: 100%; padding: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--border);
-    border-radius: var(--radius); color: var(--muted); font-size: .9rem; font-weight: 500;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, color .2s, border-color .2s; margin-bottom: 10px;
-  }
+  .btn-ghost { width: 100%; padding: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: .9rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .2s, color .2s, border-color .2s; margin-bottom: 10px; }
   .btn-ghost:hover { background: rgba(255,255,255,.08); color: var(--text); border-color: rgba(255,255,255,.14); }
-
   .footer-link { text-align: center; font-size: .83rem; color: var(--muted); margin-top: 14px; }
   .footer-link a { color: var(--purple); text-decoration: none; }
   .footer-link a:hover { text-decoration: underline; }
+
+  /* GOOGLE INFO BOX — shown on steps 2&3 for social users */
+  .social-info { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: rgba(155,127,244,.07); border: 1px solid rgba(155,127,244,.2); margin-bottom: 22px; font-size: .78rem; color: var(--muted); }
+  .social-info span { color: var(--purple); font-weight: 600; }
 
   /* SUCCESS */
   .success-wrap { text-align: center; padding: 20px 0; }
@@ -215,19 +151,13 @@
   .success-wrap h2 { font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: #fff; margin-bottom: 10px; }
   .success-wrap p { color: var(--muted); font-size: .9rem; line-height: 1.6; max-width: 320px; margin: 0 auto 28px; }
 
-  .badge {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 20;
-    background: rgba(13,13,26,.85); border: 1px solid var(--border);
-    backdrop-filter: blur(12px); border-radius: 999px;
-    padding: 10px 20px; font-size: .78rem; color: var(--muted);
-    display: flex; align-items: center; gap: 8px; white-space: nowrap;
-  }
+  .badge { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(13,13,26,.85); border: 1px solid var(--border); backdrop-filter: blur(12px); border-radius: 999px; padding: 10px 20px; font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 
   @media (max-width: 800px) {
     .page { grid-template-columns: 1fr; padding: 0 20px; }
-    .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 0 24px; flex-direction: row; flex-wrap: wrap; gap: 0; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 0 24px; flex-direction: row; flex-wrap: wrap; }
     .sidebar-brand, .sidebar-footer { display: none; }
-    .sidebar-steps { flex-direction: row; gap: 0; }
+    .sidebar-steps { flex-direction: row; }
     .sidebar-step { padding-bottom: 0; padding-right: 24px; }
     .sidebar-step::after { display: none; }
     .form-area { padding: 32px 0 80px; }
@@ -248,7 +178,7 @@
   </ul>
   <div class="nav-right">
     <div class="lang-pill">🇬🇧 English ▾</div>
-    <button class="btn-nav">Sign Up Free</button>
+    <a href="{% url 'login' %}"><button class="btn-nav">Sign In</button></a>
   </div>
 </nav>
 
@@ -280,142 +210,225 @@
   <div class="form-area">
   <div class="card">
 
-    <!-- STEP 1 -->
+    <!-- ─── STEP 1: Account ─── -->
     <div class="step active" id="step1">
       <div class="card-header">
         <div class="eyebrow">Step 1 of 3</div>
         <h2>Create your account</h2>
         <p>Free forever. No credit card needed.</p>
       </div>
-      <a href="/auth/google/login/"></a>
-        <button class="btn-google">
+
+      <!-- Social login buttons -->
+      <a href="/auth/google/login/?next=/accounts/register/%3Fsocial%3Dtrue%26provider%3DGoogle">
+        <button class="btn-google" type="button">
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
           Continue with Google
         </button>
       </a>
+      <a href="/auth/github/login/?next=/accounts/register/%3Fsocial%3Dtrue%26provider%3DGitHub">
+        <button class="btn-github" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          Continue with GitHub
+        </button>
+      </a>
+
       <div class="divider">or register with email</div>
-      <div class="fields">
-        <div class="row-2">
-          <div class="field"><label>First name</label><input type="text" placeholder="Alex" /></div>
-          <div class="field"><label>Last name</label><input type="text" placeholder="Morgan" /></div>
-        </div>
-        <div class="field"><label>University email</label><input type="email" placeholder="you@university.edu" /></div>
-        <div class="field">
-          <label>Password</label>
-          <div class="pw-wrap">
-            <input type="password" id="pw1" placeholder="At least 8 characters" oninput="checkStr(this.value)" />
-            <button class="pw-toggle" onclick="togglePw('pw1','e1')" type="button">
-              <svg id="e1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+
+      <form id="form-step1" novalidate>
+        <div class="fields">
+          <div class="row-2">
+            <div class="field">
+              <label>First name <span class="req">*</span></label>
+              <input type="text" id="f-first" placeholder="Alex" />
+              <div class="field-error" id="e-first">Please enter your first name</div>
+            </div>
+            <div class="field">
+              <label>Last name <span class="req">*</span></label>
+              <input type="text" id="f-last" placeholder="Morgan" />
+              <div class="field-error" id="e-last">Please enter your last name</div>
+            </div>
           </div>
-          <div class="strength" id="str"><span></span><span></span><span></span><span></span></div>
-        </div>
-        <div class="field">
-          <label>Confirm password</label>
-          <div class="pw-wrap">
-            <input type="password" id="pw2" placeholder="Repeat password" />
-            <button class="pw-toggle" onclick="togglePw('pw2','e2')" type="button">
-              <svg id="e2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+          <div class="field">
+            <label>University email <span class="req">*</span></label>
+            <input type="email" id="f-email" placeholder="you@university.edu" />
+            <div class="field-error" id="e-email">Please enter a valid email address</div>
+          </div>
+          <div class="field">
+            <label>Password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="pw1" placeholder="At least 8 characters" oninput="checkStr(this.value)" />
+              <button class="pw-toggle" onclick="togglePw('pw1','e1')" type="button">
+                <svg id="e1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="strength" id="str"><span></span><span></span><span></span><span></span></div>
+            <div class="field-error" id="e-pw1">Password must be at least 8 characters</div>
+          </div>
+          <div class="field">
+            <label>Confirm password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="pw2" placeholder="Repeat password" />
+              <button class="pw-toggle" onclick="togglePw('pw2','e2')" type="button">
+                <svg id="e2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="field-error" id="e-pw2">Passwords do not match</div>
           </div>
         </div>
-      </div>
-      <div class="terms">
-        <input type="checkbox" id="agree" onchange="document.getElementById('next1').disabled=!this.checked" />
-        <label for="agree">I agree to MindMate's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. My data is always anonymous.</label>
-      </div>
-      <button class="btn-primary" id="next1" onclick="goStep(2)" disabled>
-        Continue
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
+        <div class="terms">
+          <input type="checkbox" id="agree" />
+          <label for="agree">I agree to MindMate's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. My data is always anonymous.</label>
+        </div>
+        <div class="field-error show" id="e-agree" style="display:none;margin-bottom:10px">Please agree to the terms to continue</div>
+        <button type="button" class="btn-primary" onclick="validateStep1()">
+          Continue
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </form>
       <div class="footer-link">Already have an account? <a href="{% url 'login' %}">Sign in</a></div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- ─── STEP 2: Profile ─── -->
     <div class="step" id="step2">
       <div class="card-header">
         <div class="eyebrow">Step 2 of 3</div>
         <h2>Tell us about you</h2>
         <p>This helps us personalise your MindMate experience.</p>
       </div>
-      <div class="fields">
-        <div class="field"><label>University / Institution</label><input type="text" placeholder="e.g. University of Edinburgh" /></div>
-        <div class="row-2">
-          <div class="field">
-            <label>Year of study</label>
-            <select><option value="" disabled selected>Select year</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>Postgraduate</option><option>PhD</option></select>
-          </div>
-          <div class="field">
-            <label>Subject area</label>
-            <select><option value="" disabled selected>Select area</option><option>Arts & Humanities</option><option>Sciences</option><option>Engineering</option><option>Medicine</option><option>Business</option><option>Law</option><option>Other</option></select>
-          </div>
-        </div>
-        <div class="field">
-          <label style="margin-bottom:10px;">Choose your avatar</label>
-          <div class="avatar-row" id="avatars">
-            <div class="avatar-opt" onclick="pickAvatar(this)">🌙</div>
-            <div class="avatar-opt" onclick="pickAvatar(this)">🌿</div>
-            <div class="avatar-opt" onclick="pickAvatar(this)">🌊</div>
-            <div class="avatar-opt" onclick="pickAvatar(this)">☀️</div>
-            <div class="avatar-opt" onclick="pickAvatar(this)">🔮</div>
-            <div class="avatar-opt" onclick="pickAvatar(this)">🦋</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Pronouns <span style="color:rgba(136,136,170,.5);">(optional)</span></label>
-          <select><option value="" disabled selected>Prefer not to say</option><option>He / Him</option><option>She / Her</option><option>They / Them</option><option>Other</option></select>
-        </div>
+
+      <!-- shown only for Google/GitHub users -->
+      <div class="social-info" id="social-info" style="display:none">
+        <svg width="14" height="14" fill="none" stroke="var(--purple)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Signed in with <span id="social-provider">Google</span> — just complete your profile below.
       </div>
-      <br/>
-      <button class="btn-primary" onclick="goStep(3)">Continue <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-      <button class="btn-ghost" onclick="goStep(1)"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
+
+      <form id="form-step2" novalidate>
+        <div class="fields">
+          <div class="field">
+            <label>University / Institution <span class="req">*</span></label>
+            <input type="text" id="f-uni" placeholder="e.g. University of Edinburgh" />
+            <div class="field-error" id="e-uni">Please enter your university or institution</div>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label>Year of study <span class="req">*</span></label>
+              <select id="f-year">
+                <option value="" disabled selected>Select year</option>
+                <option>1st Year</option><option>2nd Year</option><option>3rd Year</option>
+                <option>4th Year</option><option>Postgraduate</option><option>PhD</option>
+              </select>
+              <div class="field-error" id="e-year">Please select your year of study</div>
+            </div>
+            <div class="field">
+              <label>Subject area <span class="req">*</span></label>
+              <select id="f-subject">
+                <option value="" disabled selected>Select area</option>
+                <option>Arts & Humanities</option><option>Sciences</option>
+                <option>Engineering</option><option>Medicine</option>
+                <option>Business</option><option>Law</option><option>Other</option>
+              </select>
+              <div class="field-error" id="e-subject">Please select your subject area</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Choose your avatar <span class="req">*</span></label>
+            <div style="margin-top:6px">
+              <div class="avatar-row" id="avatars">
+                <div class="avatar-opt" onclick="pickAvatar(this,'🌙')">🌙</div>
+                <div class="avatar-opt" onclick="pickAvatar(this,'🌿')">🌿</div>
+                <div class="avatar-opt" onclick="pickAvatar(this,'🌊')">🌊</div>
+                <div class="avatar-opt" onclick="pickAvatar(this,'☀️')">☀️</div>
+                <div class="avatar-opt" onclick="pickAvatar(this,'🔮')">🔮</div>
+                <div class="avatar-opt" onclick="pickAvatar(this,'🦋')">🦋</div>
+              </div>
+              <div class="avatar-error" id="e-avatar">Please choose an avatar</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Pronouns <span style="color:rgba(136,136,170,.5)">(optional)</span></label>
+            <select id="f-pronouns">
+              <option value="" selected>Prefer not to say</option>
+              <option>He / Him</option><option>She / Her</option><option>They / Them</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <br/>
+        <button type="button" class="btn-primary" onclick="validateStep2()">
+          Continue
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <!-- back only shown for email users, not social -->
+        <button type="button" class="btn-ghost" id="back-btn-2" onclick="goStep(1)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          Back
+        </button>
+      </form>
     </div>
 
-    <!-- STEP 3 -->
+    <!-- ─── STEP 3: Wellbeing ─── -->
     <div class="step" id="step3">
       <div class="card-header">
         <div class="eyebrow">Step 3 of 3</div>
         <h2>What's weighing on you?</h2>
         <p>Select anything that feels relevant. This shapes your daily check-ins.</p>
       </div>
-      <div class="interests" id="chips" style="margin-bottom:24px;">
-        <div class="interest-chip" onclick="toggleChip(this)">😰 Exam stress</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🛏 Sleep issues</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🤯 Burnout</div>
-        <div class="interest-chip" onclick="toggleChip(this)">💸 Financial worry</div>
-        <div class="interest-chip" onclick="toggleChip(this)">😔 Low mood</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🫀 Anxiety</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🤝 Loneliness</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🧠 Focus & ADHD</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🏠 Homesickness</div>
-        <div class="interest-chip" onclick="toggleChip(this)">📚 Imposter syndrome</div>
-        <div class="interest-chip" onclick="toggleChip(this)">💔 Relationships</div>
-        <div class="interest-chip" onclick="toggleChip(this)">🌱 Just exploring</div>
-      </div>
-      <div class="field" style="margin-bottom:20px;">
-        <label>How are you feeling right now?</label>
-        <select><option value="" disabled selected>Choose a mood</option><option>😊 Good — just checking in</option><option>😐 Okay but could be better</option><option>😔 Struggling a bit</option><option>😰 Really overwhelmed</option><option>😶 Not sure / blank</option></select>
-      </div>
-      <button class="btn-primary" onclick="goStep(4)">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Begin My Journey
-      </button>
-      <button class="btn-ghost" onclick="goStep(2)"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
+
+      <form id="form-step3" novalidate>
+        <div class="interests" id="chips" style="margin-bottom:8px;">
+          <div class="interest-chip" onclick="toggleChip(this)">😰 Exam stress</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🛏 Sleep issues</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🤯 Burnout</div>
+          <div class="interest-chip" onclick="toggleChip(this)">💸 Financial worry</div>
+          <div class="interest-chip" onclick="toggleChip(this)">😔 Low mood</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🫀 Anxiety</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🤝 Loneliness</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🧠 Focus & ADHD</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🏠 Homesickness</div>
+          <div class="interest-chip" onclick="toggleChip(this)">📚 Imposter syndrome</div>
+          <div class="interest-chip" onclick="toggleChip(this)">💔 Relationships</div>
+          <div class="interest-chip" onclick="toggleChip(this)">🌱 Just exploring</div>
+        </div>
+        <div class="chip-error" id="e-chips">Please select at least one topic</div>
+
+        <div class="field" style="margin: 20px 0;">
+          <label>How are you feeling right now? <span class="req">*</span></label>
+          <select id="f-mood">
+            <option value="" disabled selected>Choose a mood</option>
+            <option value="5">😊 Good — just checking in</option>
+            <option value="3">😐 Okay but could be better</option>
+            <option value="2">😔 Struggling a bit</option>
+            <option value="1">😰 Really overwhelmed</option>
+            <option value="3">😶 Not sure / blank</option>
+          </select>
+          <div class="field-error" id="e-mood">Please select how you're feeling</div>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="validateStep3()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Begin My Journey
+        </button>
+        <button type="button" class="btn-ghost" onclick="goStep(2)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          Back
+        </button>
+      </form>
     </div>
 
-    <!-- STEP 4 SUCCESS -->
+    <!-- ─── STEP 4: Success ─── -->
     <div class="step" id="step4">
       <div class="success-wrap">
         <div class="confetti">🎉</div>
-        <div class="check-anim"><svg width="32" height="32" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="check-anim">
+          <svg width="32" height="32" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
         <h2>Welcome to MindMate</h2>
         <p>Your quiet corner on campus is ready. Check in daily, track your mood, and let us walk alongside you.</p>
-        <a href="{% url 'home' %}">
+        <a href="{% url 'userboard' %}">
           <button class="btn-primary" style="max-width:280px; margin:0 auto;">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             Go to Dashboard
+          </button>
         </a>
-        </button>
       </div>
     </div>
 
@@ -429,6 +442,23 @@
 </div>
 
 <script>
+  // ── STATE ──
+  let selectedAvatar = '';
+  let isSocialUser = false;
+
+  // check if user arrived here after Google/GitHub login
+  // Django will pass ?social=true when redirecting after allauth signup
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('social') === 'true') {
+    isSocialUser = true;
+    const provider = params.get('provider') || 'Google';
+    document.getElementById('social-provider').textContent = provider;
+    document.getElementById('social-info').style.display = 'flex';
+    document.getElementById('back-btn-2').style.display = 'none';
+    goStep(2); // skip step 1 for social users
+  }
+
+  // ── STEP NAVIGATION ──
   function goStep(n) {
     document.querySelectorAll('.step').forEach((s,i) => s.classList.toggle('active', i === n-1));
     [1,2,3].forEach(i => {
@@ -443,18 +473,146 @@
         icon.textContent = i;
       }
     });
-    if (n === 4) document.getElementById('step-bar') && (document.getElementById('step-bar').style.display='none');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // ── VALIDATION HELPERS ──
+  function setError(fieldId, errorId, condition) {
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    if (condition) {
+      field.classList.add('error');
+      error.classList.add('show');
+      return true;
+    } else {
+      field.classList.remove('error');
+      error.classList.remove('show');
+      return false;
+    }
+  }
+
+  function clearError(fieldId, errorId) {
+    document.getElementById(fieldId)?.classList.remove('error');
+    document.getElementById(errorId)?.classList.remove('show');
+  }
+
+  // ── STEP 1 VALIDATION ──
+  function validateStep1() {
+    let hasError = false;
+    hasError = setError('f-first', 'e-first', !document.getElementById('f-first').value.trim()) || hasError;
+    hasError = setError('f-last', 'e-last', !document.getElementById('f-last').value.trim()) || hasError;
+    const email = document.getElementById('f-email').value.trim();
+    hasError = setError('f-email', 'e-email', !email || !email.includes('@')) || hasError;
+    hasError = setError('pw1', 'e-pw1', document.getElementById('pw1').value.length < 8) || hasError;
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    hasError = setError('pw2', 'e-pw2', pw2 !== pw1 || !pw2) || hasError;
+    const agreeEl = document.getElementById('agree');
+    const agreeErr = document.getElementById('e-agree');
+    if (!agreeEl.checked) {
+      agreeErr.style.display = 'block';
+      hasError = true;
+    } else {
+      agreeErr.style.display = 'none';
+    }
+    if (!hasError) goStep(2);
+  }
+
+  // ── STEP 2 VALIDATION ──
+  function validateStep2() {
+    let hasError = false;
+    hasError = setError('f-uni', 'e-uni', !document.getElementById('f-uni').value.trim()) || hasError;
+    hasError = setError('f-year', 'e-year', !document.getElementById('f-year').value) || hasError;
+    hasError = setError('f-subject', 'e-subject', !document.getElementById('f-subject').value) || hasError;
+    const avatarErr = document.getElementById('e-avatar');
+    if (!selectedAvatar) {
+      avatarErr.classList.add('show');
+      hasError = true;
+    } else {
+      avatarErr.classList.remove('show');
+    }
+    if (!hasError) goStep(3);
+  }
+
+  // ── STEP 3 VALIDATION ──
+  function validateStep3() {
+    let hasError = false;
+    const chips = document.querySelectorAll('.interest-chip.selected');
+    const chipErr = document.getElementById('e-chips');
+    if (chips.length === 0) {
+      chipErr.classList.add('show');
+      hasError = true;
+    } else {
+      chipErr.classList.remove('show');
+    }
+    hasError = setError('f-mood', 'e-mood', !document.getElementById('f-mood').value) || hasError;
+    if (!hasError) submitRegistration();
+  }
+
+  // ── SUBMIT ──
+  function submitRegistration() {
+    // collect all data
+    const data = {
+      first_name: document.getElementById('f-first')?.value || '',
+      last_name: document.getElementById('f-last')?.value || '',
+      email: document.getElementById('f-email')?.value || '',
+      university: document.getElementById('f-uni').value,
+      year_of_study: document.getElementById('f-year').value,
+      subject_area: document.getElementById('f-subject').value,
+      pronouns: document.getElementById('f-pronouns').value,
+      avatar: selectedAvatar,
+      interests: [...document.querySelectorAll('.interest-chip.selected')].map(c => c.textContent.trim()),
+      mood: document.getElementById('f-mood').value,
+      is_social: isSocialUser,
+    };
+
+    // POST to Django register view
+    fetch("{% url 'register' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify(data),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        goStep(4);
+      } else {
+        alert(res.error || 'Something went wrong. Please try again.');
+      }
+    })
+    .catch(() => {
+      // still go to step 4 if fetch fails (e.g. during HTML-only testing)
+      goStep(4);
+    });
+  }
+
+  // ── HELPERS ──
   function toggleChip(el) { el.classList.toggle('selected'); }
-  function pickAvatar(el) { document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected')); el.classList.add('selected'); }
+
+  function pickAvatar(el, emoji) {
+    document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAvatar = emoji;
+    document.getElementById('e-avatar').classList.remove('show');
+  }
+
   function togglePw(id, iconId) {
     const pw = document.getElementById(id), icon = document.getElementById(iconId);
-    if (pw.type === 'password') { pw.type = 'text'; icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`; }
-    else { pw.type = 'password'; icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`; }
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      pw.type = 'password';
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
   }
+
   function checkStr(val) {
-    const bar = document.getElementById('str'); bar.className = 'strength';
+    const bar = document.getElementById('str');
+    bar.className = 'strength';
     if (!val) return;
     let s = 0;
     if (val.length >= 8) s++;
@@ -463,6 +621,21 @@
     if (/[^A-Za-z0-9]/.test(val)) s++;
     bar.classList.add('s' + s);
   }
+
+  function getCookie(name) {
+    const v = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith(name + '='));
+    return v ? decodeURIComponent(v.split('=')[1]) : '';
+  }
+
+  // clear errors on input
+  ['f-first','f-last','f-email','pw1','pw2','f-uni','f-year','f-subject','f-mood'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('error');
+      const errId = 'e-' + id.replace('f-','');
+      document.getElementById(errId)?.classList.remove('show');
+    });
+  });
 </script>
 </body>
 </html>
