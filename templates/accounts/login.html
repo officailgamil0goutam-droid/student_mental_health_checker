@@ -1,501 +1,56 @@
-{% load socialaccount %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MindMate — Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<!-- Replace the existing fields + submit button section in login.html with this -->
+<!-- The form needs method POST and csrf_token to work with Django -->
 
-  :root {
-    --bg:         #0d0d1a;
-    --card:       #181830;
-    --border:     rgba(255,255,255,0.07);
-    --purple:     #9b7ff4;
-    --purple-dim: #7b5fd4;
-    --green:      #4ade80;
-    --text:       #e8e8f0;
-    --muted:      #8888aa;
-    --radius:     14px;
-  }
+<form method="POST" action="{% url 'login' %}">
+  {% csrf_token %}
 
-  html, body {
-    min-height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    overflow-x: hidden;
-  }
-
-  /* ── mesh background ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 75% 60% at 65% 5%,  rgba(80,40,180,.38) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 50% at 10% 85%, rgba(20,100,80,.24) 0%, transparent 55%),
-      radial-gradient(ellipse 45% 40% at 92% 92%, rgba(120,60,200,.16) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  /* ── grain ── */
-  body::after {
-    content: '';
-    position: fixed; inset: 0; z-index: 1;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-    pointer-events: none; opacity: .6;
-  }
-
-  /* ── nav ── */
-  nav {
-    position: relative; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 48px;
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-  }
-  .logo {
-    display: flex; align-items: center; gap: 8px;
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.35rem; color: var(--text); text-decoration: none;
-  }
-  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
-
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
-  .nav-links a:hover { color: var(--text); }
-
-  .nav-right { display: flex; align-items: center; gap: 16px; }
-  .lang-pill {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 999px;
-    border: 1px solid var(--border);
-    font-size: .8rem; color: var(--muted); cursor: pointer;
-  }
-  .btn-nav {
-    padding: 10px 22px; border-radius: 999px;
-    background: var(--purple); color: #fff;
-    font-size: .88rem; font-weight: 500;
-    border: none; cursor: pointer;
-    transition: background .2s, transform .15s;
-  }
-  .btn-nav:hover { background: var(--purple-dim); transform: translateY(-1px); }
-
-  /* ── page ── */
-  .page {
-    position: relative; z-index: 5;
-    min-height: calc(100vh - 69px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 48px 24px;
-  }
-
-  /* ── card ── */
-  .card {
-    width: 100%; max-width: 420px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 44px 40px;
-    box-shadow:
-      0 0 0 1px rgba(155,127,244,.08),
-      0 40px 80px rgba(0,0,0,.55),
-      inset 0 1px 0 rgba(255,255,255,.06);
-    animation: cardIn .55s cubic-bezier(.22,1,.36,1) both;
-  }
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(28px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── header ── */
-  .card-top { text-align: center; margin-bottom: 32px; }
-
-  .logo-mark {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.25rem; color: var(--text);
-    margin-bottom: 20px;
-  }
-  .logo-mark span {
-    width: 9px; height: 9px; border-radius: 50%;
-    background: var(--purple);
-    box-shadow: 0 0 10px rgba(155,127,244,.6);
-  }
-
-  .card-top h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.75rem; color: #fff; margin-bottom: 7px;
-  }
-  .card-top p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
-
-  /* ── social buttons ── */
-  .socials {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin-top: 4px;
-  }
-
-  .btn-social {
-    width: 100%; padding: 12px 14px;
-    display: flex; align-items: center; justify-content: center; gap: 9px;
-    border-radius: var(--radius);
-    font-size: .85rem; font-weight: 500;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,.04);
-    color: var(--text);
-    position: relative; overflow: hidden;
-  }
-  .btn-social:hover {
-    background: rgba(255,255,255,.09);
-    border-color: rgba(255,255,255,.16);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,.3);
-  }
-  .btn-social:active { transform: translateY(0); }
-
-  /* ── divider ── */
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 22px 0; color: var(--muted); font-size: .77rem;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-
-  /* ── fields ── */
-  .fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 6px; }
-
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field-row { display: flex; align-items: center; justify-content: space-between; }
-  .field label { font-size: .76rem; color: var(--muted); font-weight: 500; letter-spacing: .03em; }
-  .field .forgot { font-size: .75rem; color: var(--purple); text-decoration: none; transition: opacity .2s; }
-  .field .forgot:hover { opacity: .75; text-decoration: underline; }
-
-  .field input {
-    padding: 13px 16px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text); font-size: .9rem;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: border-color .2s, background .2s, box-shadow .2s;
-  }
-  .field input::placeholder { color: rgba(255,255,255,.2); }
-  .field input:focus {
-    border-color: var(--purple);
-    background: rgba(155,127,244,.06);
-    box-shadow: 0 0 0 3px rgba(155,127,244,.12);
-  }
-
-  /* pw toggle */
-  .pw-wrap { position: relative; }
-  .pw-wrap input { width: 100%; padding-right: 46px; }
-  .pw-toggle {
-    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; color: var(--muted);
-    display: flex; align-items: center; transition: color .2s; padding: 2px;
-  }
-  .pw-toggle:hover { color: var(--text); }
-
-  /* remember */
-  .remember {
-    display: flex; align-items: center; gap: 9px;
-    font-size: .8rem; color: var(--muted); margin: 16px 0;
-    cursor: pointer; user-select: none;
-  }
-  .remember input { accent-color: var(--purple); width: 15px; height: 15px; cursor: pointer; }
-
-  /* ── submit ── */
-  .btn-submit {
-    width: 100%; padding: 14px;
-    background: var(--purple); border: none; border-radius: var(--radius);
-    color: #fff; font-size: .95rem; font-weight: 600;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s, box-shadow .2s;
-    box-shadow: 0 4px 20px rgba(155,127,244,.3);
-    margin-bottom: 20px;
-  }
-  .btn-submit:hover {
-    background: var(--purple-dim);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(155,127,244,.42);
-  }
-  .btn-submit:active { transform: translateY(0); }
-
-  /* ── or-divider below socials ── */
-  .or-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 24px 0 0; color: var(--muted); font-size: .77rem;
-  }
-  .or-divider::before, .or-divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-
-  /* ── create account ── */
-  .create-account {
-    margin-top: 20px;
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    background: linear-gradient(135deg, rgba(155,127,244,.08) 0%, rgba(74,222,128,.06) 100%);
-    border: 1px solid rgba(155,127,244,.18);
-    padding: 22px 22px 20px;
-  }
-  /* shimmer top bar */
-  .create-account::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--purple), var(--green), var(--purple));
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-  }
-  @keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  .create-account-inner {
-    display: flex; align-items: center; gap: 16px;
-  }
-
-  .ca-icon {
-    flex-shrink: 0;
-    width: 44px; height: 44px; border-radius: 12px;
-    background: rgba(155,127,244,.15);
-    border: 1px solid rgba(155,127,244,.25);
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .ca-text { flex: 1; }
-  .ca-text strong {
-    display: block; font-size: .92rem;
-    color: var(--text); font-weight: 600; margin-bottom: 3px;
-  }
-  .ca-text span { font-size: .78rem; color: var(--muted); line-height: 1.4; }
-
-  .btn-create {
-    margin-top: 14px; width: 100%;
-    padding: 12px;
-    border-radius: var(--radius);
-    background: rgba(155,127,244,.12);
-    border: 1px solid rgba(155,127,244,.3);
-    color: var(--purple); font-size: .88rem; font-weight: 600;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
-    letter-spacing: .01em;
-  }
-  .btn-create:hover {
-    background: rgba(155,127,244,.22);
-    border-color: rgba(155,127,244,.55);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(155,127,244,.18);
-  }
-  .btn-create svg { transition: transform .2s; }
-  .btn-create:hover svg { transform: translateX(3px); }
-
-  .ca-perks {
-    display: flex; gap: 14px; margin-top: 12px; flex-wrap: wrap;
-  }
-  .ca-perk {
-    display: flex; align-items: center; gap: 5px;
-    font-size: .73rem; color: var(--muted);
-  }
-  .ca-perk svg { color: var(--green); flex-shrink: 0; }
-
-  /* ── trust line ── */
-  .trust {
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-    margin-top: 20px; font-size: .75rem; color: var(--muted);
-  }
-
-  /* ── badge ── */
-  .badge {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    z-index: 20;
-    background: rgba(13,13,26,.85); border: 1px solid var(--border);
-    backdrop-filter: blur(12px); border-radius: 999px;
-    padding: 10px 20px; font-size: .78rem; color: var(--muted);
-    display: flex; align-items: center; gap: 8px; white-space: nowrap;
-  }
-
-  @media (max-width: 600px) {
-    nav { padding: 18px 20px; }
-    .nav-links { display: none; }
-    .card { padding: 32px 22px; }
-    .create-account { flex-direction: column; text-align: center; }
-  }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a class="logo" href="#"><span class="logo-dot"></span> MindMate</a>
-  <ul class="nav-links">
-    <li><a href="#">Features</a></li>
-    <li><a href="#">How It Works</a></li>
-    <li><a href="#">About</a></li>
-    <li><a href="#">Resources</a></li>
-  </ul>
-  <div class="nav-right">
-    <div class="lang-pill">🇬🇧 English ▾</div>
-    <button class="btn-nav">Sign Up Free</button>
+  <!-- show error if login failed -->
+  {% if error %}
+  <div style="padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.82rem;color:#f87171;margin-bottom:16px;">
+    {{ error }}
   </div>
-</nav>
+  {% endif %}
 
-<!-- PAGE -->
-<div class="page">
-  <div class="card">
-
-    <!-- Header -->
-    <div class="card-top">
-      <div class="logo-mark"><span></span> MindMate</div>
-      <h2>Welcome back</h2>
-      <p>Your quiet corner on campus is waiting.</p>
+  <div class="fields">
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" name="email" placeholder="you@university.edu" autocomplete="email" required />
     </div>
-
-    <!-- Form -->
-    <div class="fields">
-      <div class="field">
-        <label>Email address</label>
-        <input type="email" name="email" placeholder="you@university.edu" autocomplete="email" />
+    <div class="field">
+      <div class="field-row">
+        <label>Password</label>
+        <a href="{% url 'forget_password' %}" class="forgot">Forgot password?</a>
       </div>
-
-      <div class="field">
-        <div class="field-row">
-          <label>Password</label>
-          <a href="{% url 'forget_password' %}" class="forgot">Forgot password?</a>
-        </div>
-        <div class="pw-wrap">
-          <input type="password" name="password" id="pw" placeholder="Your password" autocomplete="current-password" />
-          <button class="pw-toggle" onclick="togglePw()" type="button" aria-label="Toggle password">
-            <svg id="eye" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <label class="remember">
-      <input type="checkbox" checked /> Keep me signed in for 30 days
-    </label>
-
-    <button type="submit" class="btn-submit">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
-      </svg>
-      Sign In
-    </button>
-
-  </form>
-
-    <!-- Divider -->
-    <div class="divider">or continue with</div>
-
-    <!-- Social logins — BOTTOM -->
-    <div class="socials">
-      <!-- Google -->
-      <a href="/auth/google/login/">
-        <button class="btn-social">
-          <svg width="17" height="17" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      <div class="pw-wrap">
+        <input type="password" name="password" id="pw" placeholder="Your password" autocomplete="current-password" required />
+        <button class="pw-toggle" onclick="togglePw()" type="button" aria-label="Toggle password">
+          <svg id="eye" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
           </svg>
-          Google
         </button>
-      </a>
-      <!-- GitHub -->
-      <a href="/auth/github/login/">
-        <button class="btn-social">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="var(--text)">
-            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
-          </svg>
-          GitHub
-        </button>
-      </a>
-    </div>
-
-    <!-- Create Account Block — redesigned -->
-    <div class="create-account">
-      <div class="create-account-inner">
-        <div class="ca-icon">
-          <svg width="20" height="20" fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 24 24">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <line x1="19" y1="8" x2="19" y2="14"/>
-            <line x1="22" y1="11" x2="16" y2="11"/>
-          </svg>
-        </div>
-        <div class="ca-text">
-          <strong>New to MindMate?</strong>
-          <span>Join thousands of students feeling better.</span>
-        </div>
       </div>
-
-      <div class="ca-perks">
-        <div class="ca-perk">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Free forever
-        </div>
-        <div class="ca-perk">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Always anonymous
-        </div>
-        <div class="ca-perk">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          No credit card
-        </div>
-      </div>
-
-      <button class="btn-create" onclick="location.href='/register/'">
-        Create your free account
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </button>
     </div>
-
-    <!-- Trust -->
-    <div class="trust">
-      <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      Always anonymous. Never judgmental. Always here.
-    </div>
-
   </div>
-</div>
 
-<!-- BADGE -->
-<div class="badge">
-  <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  <label class="remember">
+    <input type="checkbox" name="remember" checked /> Keep me signed in for 30 days
+  </label>
+
+  <button type="submit" class="btn-submit">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+    </svg>
+    Sign In
+  </button>
+
+</form>
+
+<!-- also fix the "Create Account" button at the bottom of login.html -->
+<!-- replace onclick="location.href='/register/'" with: -->
+<button class="btn-create" onclick="location.href='{% url &quot;register&quot; %}'">
+  Create your free account
+  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path d="M5 12h14M12 5l7 7-7 7"/>
   </svg>
-  Always anonymous. Never judgmental. Always here.
-</div>
-
-<script>
-  function togglePw() {
-    const pw  = document.getElementById('pw');
-    const eye = document.getElementById('eye');
-    if (pw.type === 'password') {
-      pw.type = 'text';
-      eye.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
-    } else {
-      pw.type = 'password';
-      eye.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-    }
-  }
-</script>
-</body>
-</html>
+</button>
