@@ -150,15 +150,11 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
-=======
 # showing the actual error
 SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
 
 # Allow allauth to redirect to the register page with query params
 LOGIN_REDIRECT_URL = '/accounts/register/?social=true&provider=Google'
-
->>>>>>> e7762b36441741f63aa8d42827215a805335ff8d
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
