@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile — MindMate{% endblock %}
+
+{% block extra_css %}
+.page { position: relative; z-index: 5; max-width: 1100px; margin: 0 auto; padding: 40px 24px 100px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+.profile-header { display: flex; align-items: center; gap: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 32px; margin-bottom: 24px; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--purple-faint); border: 2px solid rgba(155,127,244,.3); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; flex-shrink: 0; }
+.profile-info h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 4px; }
+.profile-info p  { font-size: .84rem; color: var(--muted); margin-bottom: 12px; }
+.profile-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.profile-tag { padding: 4px 12px; border-radius: 999px; font-size: .72rem; font-weight: 600; background: var(--purple-faint); color: var(--purple); border: 1px solid rgba(155,127,244,.2); }
+.btn-edit { margin-left: auto; padding: 9px 20px; border-radius: 999px; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); color: var(--purple); font-size: .82rem; font-weight: 600; text-decoration: none; transition: all .2s; white-space: nowrap; }
+.btn-edit:hover { background: rgba(155,127,244,.2); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; text-align: center; }
+.stat-card:nth-child(2){animation-delay:.05s}.stat-card:nth-child(3){animation-delay:.1s}.stat-card:nth-child(4){animation-delay:.15s}
+.stat-num  { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; line-height: 1; margin-bottom: 4px; }
+.stat-lbl  { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+.section-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: #fff; margin-bottom: 16px; }
+
+.history-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 28px; animation: fadeUp .4s .2s cubic-bezier(.22,1,.36,1) both; }
+.history-item { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 16px; }
+.history-item:last-child { border-bottom: none; padding-bottom: 0; }
+.history-date { font-size: .72rem; color: var(--muted); white-space: nowrap; min-width: 60px; margin-top: 2px; }
+.history-body { flex: 1; }
+.history-score { font-size: .84rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.history-insight { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+.risk-pill { display: inline-flex; padding: 2px 10px; border-radius: 999px; font-size: .68rem; font-weight: 600; margin-left: 8px; }
+.risk-low    { background: var(--green-faint); color: var(--green); }
+.risk-medium { background: rgba(251,191,36,.1); color: var(--amber); }
+.risk-high   { background: rgba(248,113,113,.08); color: var(--red); }
+.empty-state { text-align: center; padding: 40px 0; color: var(--muted); font-size: .88rem; }
+
+@media(max-width:760px){ .stats-grid{grid-template-columns:1fr 1fr} .profile-header{flex-direction:column;align-items:flex-start} .btn-edit{margin-left:0} }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="profile-avatar">{{ profile.avatar|default:"🌙" }}</div>
+    <div class="profile-info">
+      <h1>{{ request.user.get_full_name|default:request.user.username }}</h1>
+      <p>{{ request.user.email }}</p>
+      <div class="profile-tags">
+        {% if profile.university %}<span class="profile-tag">🎓 {{ profile.university }}</span>{% endif %}
+        {% if profile.year_of_study %}<span class="profile-tag">📅 Year {{ profile.year_of_study }}</span>{% endif %}
+        {% if profile.subject_area %}<span class="profile-tag">📚 {{ profile.subject_area }}</span>{% endif %}
+        {% if profile.pronouns %}<span class="profile-tag">{{ profile.pronouns }}</span>{% endif %}
+      </div>
+    </div>
+    <a href="{% url 'profile_edit' %}" class="btn-edit">✏️ Edit Profile</a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num">{{ total_checkins|default:"0" }}</div>
+      <div class="stat-lbl">Total Check-ins</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ avg_score|default:"—" }}</div>
+      <div class="stat-lbl">Avg Score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ streak|default:"0" }}</div>
+      <div class="stat-lbl">Current Streak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ journal_count|default:"0" }}</div>
+      <div class="stat-lbl">Journal Entries</div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-card">
+    <div class="section-title">Check-in History</div>
+    {% if history %}
+      {% for item in history %}
+      <div class="history-item">
+        <div class="history-date">{{ item.checkin.date|date:"d M" }}</div>
+        <div class="history-body">
+          <div class="history-score">
+            Score: {{ item.checkin.mental_health_score|default:"—" }}/100
+            {% if item.ai %}
+            <span class="risk-pill risk-{{ item.ai.risk_level|default:'low' }}">
+              {% if item.ai.risk_level == 'high' %}⚠ High{% elif item.ai.risk_level == 'medium' %}~ Medium{% else %}✓ Low{% endif %}
+            </span>
+            {% endif %}
+          </div>
+          {% if item.ai and item.ai.insight %}
+          <div class="history-insight">{{ item.ai.insight|truncatechars:120 }}</div>
+          {% elif item.checkin.mood_note %}
+          <div class="history-insight">{{ item.checkin.mood_note|truncatechars:120 }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        No check-ins yet.<br>
+        <a href="{% url 'userboard' %}" style="color:var(--purple);text-decoration:none">Complete your first check-in →</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

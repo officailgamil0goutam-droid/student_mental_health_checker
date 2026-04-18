@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{% block title %}MindMate{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d1a; --card: #181830; --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12); --purple: #9b7ff4; --purple-dim: #7b5fd4;
+    --purple-faint: rgba(155,127,244,.1); --green: #4ade80;
+    --green-faint: rgba(74,222,128,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #e8e8f0;
+    --muted: #8888aa; --radius: 14px;
+  }
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(80,40,180,.25) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(20,100,80,.18) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 40px; border-bottom: 1px solid var(--border); background: rgba(13,13,26,.88); backdrop-filter: blur(16px); }
+  .logo { display: flex; align-items: center; gap: 8px; font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+  .nav-center { display: flex; gap: 6px; }
+  .nav-tab { padding: 7px 16px; border-radius: 999px; font-size: .83rem; color: var(--muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; }
+  .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
+  .nav-tab.active { background: var(--purple-faint); color: var(--purple); border: 1px solid rgba(155,127,244,.3); }
+  .nav-right { display: flex; align-items: center; gap: 12px; position: relative; }
+
+  /* ── NOTIFICATION BELL ── */
+  .notif-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--border); background: rgba(255,255,255,.04);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted); transition: all .2s;
+    position: relative; text-decoration: none;
+  }
+  .notif-btn:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,.08); }
+  .notif-btn.active-page { color: var(--purple); border-color: rgba(155,127,244,.4); background: var(--purple-faint); }
+  .notif-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .user-pill { display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); cursor: pointer; transition: all .2s; user-select: none; }
+  .user-pill:hover { border-color: var(--border2); background: rgba(255,255,255,.07); }
+  .user-pill.open { border-color: rgba(155,127,244,.4); background: var(--purple-faint); }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+  .user-name { font-size: .84rem; font-weight: 500; color: var(--text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chevron { color: var(--muted); transition: transform .25s; }
+  .user-pill.open .chevron { transform: rotate(180deg); }
+  .user-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 220px; background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 8px; z-index: 200; box-shadow: 0 20px 60px rgba(0,0,0,.5); opacity: 0; transform: translateY(-8px) scale(.97); pointer-events: none; transition: all .2s cubic-bezier(.22,1,.36,1); }
+  .user-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+  .dd-header { padding: 10px 12px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .dd-avatar { font-size: 1.8rem; margin-bottom: 6px; }
+  .dd-name { font-size: .88rem; font-weight: 600; color: var(--text); }
+  .dd-email { font-size: .74rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: .84rem; color: var(--muted); cursor: pointer; text-decoration: none; transition: all .15s; }
+  .dd-item:hover { background: rgba(255,255,255,.06); color: var(--text); }
+  .dd-item.danger { color: var(--red); }
+  .dd-item.danger:hover { background: rgba(248,113,113,.08); }
+  .dd-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+  /* TOAST */
+  .toast-wrap { position: fixed; top: 80px; right: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
+  .toast { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 14px; background: var(--card); border: 1px solid var(--border2); box-shadow: 0 16px 40px rgba(0,0,0,.4); min-width: 280px; max-width: 340px; animation: toastIn .4s cubic-bezier(.22,1,.36,1) both; }
+  .toast.hiding { animation: toastOut .3s ease forwards; }
+  @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(20px)} }
+  .toast-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); }
+  .toast-body { flex: 1; }
+  .toast-title { font-size: .86rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .toast-sub { font-size: .76rem; color: var(--muted); line-height: 1.4; }
+  .toast-progress { height: 2px; background: var(--border); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+  .toast-bar { height: 100%; background: var(--purple); border-radius: 99px; }
+  .toast-close { color: var(--muted); cursor: pointer; padding: 2px; transition: color .15s; flex-shrink: 0; }
+  .toast-close:hover { color: var(--text); }
+
+  /* DJANGO MESSAGES */
+  {% if messages %}
+  .django-messages { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 600; display: flex; flex-direction: column; gap: 8px; }
+  .django-msg { padding: 12px 20px; border-radius: 12px; font-size: .84rem; font-weight: 500; border: 1px solid transparent; }
+  .django-msg.success { background: var(--green-faint); border-color: rgba(74,222,128,.3); color: var(--green); }
+  .django-msg.error   { background: rgba(248,113,113,.08); border-color: rgba(248,113,113,.3); color: var(--red); }
+  .django-msg.warning { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); color: var(--amber); }
+  {% endif %}
+
+  /* MAIN */
+  .main-content { position: relative; z-index: 5; }
+
+  /* BADGE */
+  .badge { position: fixed; bottom: 24px; left: 24px; z-index: 20; background: rgba(13,13,26,.85); border: 1px solid var(--border); backdrop-filter: blur(12px); border-radius: 999px; padding: 10px 20px; font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+
+  /* UTILITY */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes popIn  { from{opacity:0;transform:scale(.5)} to{opacity:1;transform:scale(1)} }
+  @keyframes shrink { from{width:100%} to{width:0%} }
+
+  @media(max-width:960px){
+    nav { padding: 14px 20px; }
+    .nav-center { display: none; }
+    .user-name { display: none; }
+  }
+
+  {% block extra_css %}{% endblock %}
+</style>
+{% block head_extra %}{% endblock %}
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- DJANGO MESSAGES -->
+{% if messages %}
+<div class="django-messages">
+  {% for message in messages %}
+  <div class="django-msg {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span> MindMate</a>
+  <div class="nav-center">
+    <a href="{% url 'userboard' %}"   class="nav-tab {% block nav_dashboard %}{% endblock %}">Dashboard</a>
+    <a href="{% url 'journal_new' %}" class="nav-tab {% block nav_journal %}{% endblock %}">Journal</a>
+    <a href="{% url 'progress' %}"    class="nav-tab {% block nav_progress %}{% endblock %}">Progress</a>
+    <a href="{% url 'resources' %}"   class="nav-tab {% block nav_resources %}{% endblock %}">Resources</a>
+  </div>
+  <div class="nav-right">
+
+    <!-- ✅ BELL — ab har page pe kaam karega -->
+    <a href="{% url 'notifications' %}"
+       class="notif-btn {% block nav_notifications %}{% endblock %}"
+       title="Notifications">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <div class="notif-dot"></div>
+    </a>
+
+    <div class="user-pill" id="user-pill" onclick="toggleDropdown()">
+      <div class="user-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+      <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="user-dropdown" id="user-dropdown">
+      <div class="dd-header">
+        <div class="dd-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+        <div class="dd-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="dd-email">{{ request.user.email }}</div>
+      </div>
+      <a href="{% url 'profile_view' %}" class="dd-item">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>View Profile
+      </a>
+      <a href="{% url 'profile_edit' %}" class="dd-item">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Profile
+      </a>
+      <a href="{% url 'password_change' %}" class="dd-item">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Change Password
+      </a>
+      <a href="{% url 'settings' %}" class="dd-item">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+      </a>
+      <div class="dd-divider"></div>
+      <a href="{% url 'logout' %}" class="dd-item danger">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- BOTTOM BADGE -->
+<div class="badge">
+  <svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Always anonymous. Never judgmental. Always here.
+</div>
+
+<script>
+  // DROPDOWN
+  document.addEventListener('click', function(e) {
+    const pill = document.getElementById('user-pill');
+    const dd   = document.getElementById('user-dropdown');
+    if (pill && dd && !pill.contains(e.target) && !dd.contains(e.target)) {
+      pill.classList.remove('open');
+      dd.classList.remove('open');
+    }
+  });
+  function toggleDropdown() {
+    document.getElementById('user-pill').classList.toggle('open');
+    document.getElementById('user-dropdown').classList.toggle('open');
+  }
+
+  // TOAST
+  function showToast(icon, title, sub, dur=4000) {
+    const wrap = document.getElementById('toast-wrap');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<div class="toast-icon">${icon}</div>
+      <div class="toast-body">
+        <div class="toast-title">${title}</div>
+        <div class="toast-sub">${sub}</div>
+        <div class="toast-progress"><div class="toast-bar" style="animation:shrink ${dur}ms linear forwards"></div></div>
+      </div>
+      <div class="toast-close" onclick="dismissToast(this)">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </div>`;
+    wrap.appendChild(t);
+    setTimeout(() => dismissToast(t.querySelector('.toast-close')), dur);
+  }
+  function dismissToast(btn) {
+    const t = btn.closest('.toast');
+    if (!t) return;
+    t.classList.add('hiding');
+    setTimeout(() => t.remove(), 400);
+  }
+
+  // AUTO DISMISS DJANGO MESSAGES
+  setTimeout(() => {
+    document.querySelectorAll('.django-msg').forEach(el => {
+      el.style.transition = 'opacity .4s';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    });
+  }, 4000);
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings — MindMate{% endblock %}
+
+{% block extra_css %}
+.page { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--muted); margin-bottom: 28px; }
+.breadcrumb a { color: var(--muted); text-decoration: none; transition: color .2s; }
+.breadcrumb a:hover { color: var(--purple); }
+.breadcrumb .sep { opacity: .35; }
+.breadcrumb .cur { color: var(--purple); }
+
+/* ── PAGE HEADER ── */
+.page-head { margin-bottom: 28px; }
+.page-head h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.page-head p  { font-size: .83rem; color: var(--muted); }
+
+/* ── SIDEBAR + CONTENT ── */
+.settings-layout { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; }
+
+/* ── SIDEBAR NAV ── */
+.sidebar {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 10px; position: sticky; top: 90px;
+}
+.s-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; font-size: .82rem;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+  border: none; background: none; font-family: 'DM Sans', sans-serif;
+  width: 100%; text-align: left;
+}
+.s-item:hover { color: var(--text); background: rgba(255,255,255,.05); }
+.s-item.active { color: var(--purple); background: var(--purple-faint); }
+.s-item .s-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── SECTION CARD ── */
+.sec-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 26px 28px; margin-bottom: 16px;
+  display: none;
+}
+.sec-card.active { display: block; }
+
+.sec-head { margin-bottom: 22px; }
+.sec-head h2 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.sec-head p  { font-size: .78rem; color: var(--muted); }
+.sec-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── SETTING ROW ── */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border); gap: 20px;
+}
+.setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+.setting-info { flex: 1; min-width: 0; }
+.setting-info h4 { font-size: .85rem; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.setting-info p  { font-size: .75rem; color: var(--muted); line-height: 1.4; }
+
+/* ── TOGGLE ── */
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; background: rgba(255,255,255,.08);
+  border: 1px solid var(--border2); border-radius: 99px; cursor: pointer; transition: all .2s;
+}
+.toggle-track::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 16px; height: 16px; background: var(--muted);
+  border-radius: 50%; transition: transform .2s, background .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--purple-faint); border-color: var(--purple); }
+.toggle input:checked + .toggle-track::after { transform: translateX(20px); background: var(--purple); }
+
+/* ── SELECT ── */
+.s-select {
+  background: rgba(255,255,255,.04); border: 1px solid var(--border2);
+  border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: .82rem; padding: 8px 32px 8px 12px; outline: none;
+  cursor: pointer; transition: border-color .2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238888aa' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  flex-shrink: 0;
+}
+.s-select:focus { border-color: var(--purple); }
+
+/* ── COLOR THEMES ── */
+.theme-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.theme-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 10px; font-size: .79rem;
+  border: 1.5px solid var(--border); background: rgba(255,255,255,.03);
+  cursor: pointer; transition: all .2s; color: var(--muted);
+}
+.theme-chip:hover { border-color: var(--border2); color: var(--text); }
+.theme-chip.active { border-color: var(--purple); background: var(--purple-faint); color: var(--purple); }
+.theme-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── DANGER ZONE ── */
+.danger-card {
+  background: rgba(248,113,113,.04); border: 1px solid rgba(248,113,113,.18);
+  border-radius: 20px; padding: 22px 26px; margin-bottom: 16px;
+}
+.danger-card .sec-head h2 { color: var(--red); }
+.danger-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid rgba(248,113,113,.1); gap: 16px;
+}
+.danger-row:last-child { border-bottom: none; padding-bottom: 0; }
+.danger-row h4 { font-size: .84rem; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.danger-row p  { font-size: .74rem; color: var(--muted); }
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 999px; font-size: .78rem; font-weight: 500;
+  background: transparent; border: 1px solid rgba(248,113,113,.35);
+  color: var(--red); cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-danger:hover { background: rgba(248,113,113,.08); border-color: var(--red); }
+
+/* ── SAVE BTN ── */
+.save-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+.btn-save {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 26px; border-radius: 999px; font-size: .84rem; font-weight: 500;
+  background: var(--purple); color: #fff; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 16px rgba(155,127,244,.35); transition: all .2s;
+}
+.btn-save:hover { background: var(--purple-dim); transform: translateY(-1px); }
+
+/* ── AVATAR PICKER ── */
+.avatar-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.av-opt {
+  width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.04); border: 1.5px solid var(--border);
+  cursor: pointer; transition: all .2s;
+}
+.av-opt:hover { border-color: var(--border2); transform: scale(1.1); }
+.av-opt.active { border-color: var(--purple); background: var(--purple-faint); box-shadow: 0 0 10px rgba(155,127,244,.3); }
+
+@media (max-width: 640px) {
+  .settings-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; display: flex; flex-wrap: wrap; gap: 4px; }
+  .s-item { width: auto; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="{% url 'userboard' %}">Dashboard</a>
+    <span class="sep">›</span>
+    <a href="{% url 'profile_view' %}">Profile</a>
+    <span class="sep">›</span>
+    <span class="cur">Settings</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="page-head">
+    <h1>⚙️ Settings</h1>
+    <p>Manage your account preferences and privacy.</p>
+  </div>
+
+  <form method="POST" id="settings-form">
+    {% csrf_token %}
+
+    <div class="settings-layout">
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <button type="button" class="s-item active" onclick="switchTab('notifications', this)">
+          <span class="s-icon">🔔</span> Notifications
+        </button>
+        <button type="button" class="s-item" onclick="switchTab('appearance', this)">
+          <span class="s-icon">🎨</span> Appearance
+        </button>
+        <button type="button" class="s-item" onclick="switchTab('privacy', this)">
+          <span class="s-icon">🔒</span> Privacy
+        </button>
+        <button type="button" class="s-item" onclick="switchTab('checkin', this)">
+          <span class="s-icon">📅</span> Check-ins
+        </button>
+        <button type="button" class="s-item" onclick="switchTab('account', this)">
+          <span class="s-icon">👤</span> Account
+        </button>
+        <button type="button" class="s-item" onclick="switchTab('danger', this)">
+          <span class="s-icon">⚠️</span> Danger Zone
+        </button>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div>
+
+        <!-- ── NOTIFICATIONS ── -->
+        <div class="sec-card active" id="tab-notifications">
+          <div class="sec-head">
+            <h2>🔔 Notification Preferences</h2>
+            <p>Choose what updates you want to receive.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Daily Check-in Reminder</h4>
+              <p>Get reminded to complete your daily mental health check-in.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="notif_checkin" {% if settings.notif_checkin %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Streak Alerts</h4>
+              <p>Notify me when I'm close to breaking or achieving a streak milestone.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="notif_streak" {% if settings.notif_streak %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Weekly Report</h4>
+              <p>Receive a weekly summary of your mental health progress.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="notif_weekly" {% if settings.notif_weekly %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Journal Prompts</h4>
+              <p>Get daily writing prompts to inspire your journal entries.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="notif_journal" {% if settings.notif_journal %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Reminder Time</h4>
+              <p>When should we send your daily check-in reminder?</p>
+            </div>
+            <select name="reminder_time" class="s-select">
+              <option value="morning"   {% if settings.reminder_time == "morning"   %}selected{% endif %}>🌅 8:00 AM</option>
+              <option value="afternoon" {% if settings.reminder_time == "afternoon" %}selected{% endif %}>☀️ 1:00 PM</option>
+              <option value="evening"   {% if settings.reminder_time == "evening"   %}selected{% endif %}>🌆 6:00 PM</option>
+              <option value="night"     {% if settings.reminder_time == "night"     %}selected{% endif %}>🌙 9:00 PM</option>
+            </select>
+          </div>
+
+          <div class="save-row">
+            <button type="submit" name="section" value="notifications" class="btn-save">💾 Save</button>
+          </div>
+        </div>
+
+        <!-- ── APPEARANCE ── -->
+        <div class="sec-card" id="tab-appearance">
+          <div class="sec-head">
+            <h2>🎨 Appearance</h2>
+            <p>Personalise how MindMate looks for you.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Theme</h4>
+              <p>Choose your preferred colour scheme.</p>
+            </div>
+            <select name="theme" class="s-select">
+              <option value="dark">🌑 Dark</option>
+              <option value="light">☀️ Light</option>
+              <option value="auto">🔄 System</option>
+            </select>
+          </div>
+
+          <div class="sec-divider"></div>
+
+          <div class="setting-info" style="margin-bottom:0;">
+            <h4>Accent Colour</h4>
+            <p style="margin-bottom:0;">Pick a highlight colour used across the app.</p>
+          </div>
+          <div class="theme-grid">
+            <div class="theme-chip active" onclick="pickAccent(this,'#9b7ff4')">
+              <div class="theme-dot" style="background:#9b7ff4;"></div> Purple
+            </div>
+            <div class="theme-chip" onclick="pickAccent(this,'#60a5fa')">
+              <div class="theme-dot" style="background:#60a5fa;"></div> Blue
+            </div>
+            <div class="theme-chip" onclick="pickAccent(this,'#4ade80')">
+              <div class="theme-dot" style="background:#4ade80;"></div> Green
+            </div>
+            <div class="theme-chip" onclick="pickAccent(this,'#f472b6')">
+              <div class="theme-dot" style="background:#f472b6;"></div> Pink
+            </div>
+            <div class="theme-chip" onclick="pickAccent(this,'#fbbf24')">
+              <div class="theme-dot" style="background:#fbbf24;"></div> Amber
+            </div>
+          </div>
+          <input type="hidden" name="accent_color" id="accent-input" value="{{ settings.accent_color|default:'#9b7ff4' }}"/>
+
+          <div class="sec-divider"></div>
+
+          <div class="setting-info" style="margin-bottom:8px;">
+            <h4>Avatar</h4>
+            <p>Choose your profile emoji.</p>
+          </div>
+          <div class="avatar-grid">
+            {% for emoji in "🌙🔮⭐🌟💫🌈🦋🌸🧠💡🎯🔥" %}
+            <div class="av-opt {% if request.user.profile.avatar == emoji %}active{% endif %}"
+                 onclick="pickAvatar(this, '{{ emoji }}')">{{ emoji }}</div>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="avatar" id="avatar-input" value="{{ request.user.profile.avatar|default:'🌙' }}"/>
+
+          <div class="save-row">
+            <button type="submit" name="section" value="appearance" class="btn-save">💾 Save</button>
+          </div>
+        </div>
+
+        <!-- ── PRIVACY ── -->
+        <div class="sec-card" id="tab-privacy">
+          <div class="sec-head">
+            <h2>🔒 Privacy & Data</h2>
+            <p>Control how your data is used within MindMate.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Anonymous Mode</h4>
+              <p>Your entries are always private — this is on by default and cannot be turned off.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked disabled/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>AI Analysis</h4>
+              <p>Allow MindMate to analyse your responses to improve your health score.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="allow_ai" {% if settings.allow_ai %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Usage Analytics</h4>
+              <p>Help us improve MindMate by sharing anonymous usage data.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="allow_analytics" {% if settings.allow_analytics %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="save-row">
+            <button type="submit" name="section" value="privacy" class="btn-save">💾 Save</button>
+          </div>
+        </div>
+
+        <!-- ── CHECK-INS ── -->
+        <div class="sec-card" id="tab-checkin">
+          <div class="sec-head">
+            <h2>📅 Check-in Preferences</h2>
+            <p>Customise your daily check-in experience.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Check-in Frequency</h4>
+              <p>How often do you want to check in?</p>
+            </div>
+            <select name="checkin_freq" class="s-select">
+              <option value="daily"   {% if settings.checkin_freq == "daily"   %}selected{% endif %}>Daily</option>
+              <option value="twice"   {% if settings.checkin_freq == "twice"   %}selected{% endif %}>Twice a day</option>
+              <option value="weekly"  {% if settings.checkin_freq == "weekly"  %}selected{% endif %}>Weekly</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Quick Check-in Mode</h4>
+              <p>Skip detailed questions and just log your mood quickly.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="quick_checkin" {% if settings.quick_checkin %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Show Motivational Quotes</h4>
+              <p>Display an uplifting quote after each check-in.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" name="show_quotes" {% if settings.show_quotes %}checked{% endif %}/>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="save-row">
+            <button type="submit" name="section" value="checkin" class="btn-save">💾 Save</button>
+          </div>
+        </div>
+
+        <!-- ── ACCOUNT ── -->
+        <div class="sec-card" id="tab-account">
+          <div class="sec-head">
+            <h2>👤 Account</h2>
+            <p>Manage your account details and security.</p>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Username</h4>
+              <p>@{{ request.user.username }}</p>
+            </div>
+            <a href="{% url 'profile_edit' %}" class="btn-danger" style="color:var(--purple); border-color:rgba(155,127,244,.3);">Edit →</a>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Email Address</h4>
+              <p>{{ request.user.email|default:"Not set" }}</p>
+            </div>
+            <a href="{% url 'profile_edit' %}" class="btn-danger" style="color:var(--purple); border-color:rgba(155,127,244,.3);">Edit →</a>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Password</h4>
+              <p>Last changed: {{ request.user.last_login|date:"d M Y"|default:"—" }}</p>
+            </div>
+            <a href="{% url 'password_change' %}" class="btn-danger" style="color:var(--purple); border-color:rgba(155,127,244,.3);">Change →</a>
+          </div>
+        </div>
+
+        <!-- ── DANGER ZONE ── -->
+        <div class="sec-card" id="tab-danger">
+          <div class="sec-head">
+            <h2 style="color:var(--red);">⚠️ Danger Zone</h2>
+            <p>These actions are permanent and cannot be undone.</p>
+          </div>
+
+          <div class="danger-card">
+            <div class="danger-row">
+              <div>
+                <h4>Export My Data</h4>
+                <p>Download all your check-ins, journal entries and mood history.</p>
+              </div>
+              <button type="button" class="btn-danger" style="color:var(--blue); border-color:rgba(96,165,250,.3);">
+                📥 Export
+              </button>
+            </div>
+
+            <div class="danger-row">
+              <div>
+                <h4>Clear All Journal Entries</h4>
+                <p>Permanently delete all your journal entries. This cannot be undone.</p>
+              </div>
+              <button type="button" class="btn-danger" onclick="confirmClear('journals')">
+                🗑️ Clear
+              </button>
+            </div>
+
+            <div class="danger-row">
+              <div>
+                <h4>Reset Mood History</h4>
+                <p>Delete all check-in data and reset your health score to zero.</p>
+              </div>
+              <button type="button" class="btn-danger" onclick="confirmClear('mood')">
+                🔄 Reset
+              </button>
+            </div>
+
+            <div class="danger-row">
+              <div>
+                <h4>Delete Account</h4>
+                <p>Permanently delete your MindMate account and all associated data.</p>
+              </div>
+              <a href="{% url 'delete_account' %}" class="btn-danger">
+                ❌ Delete
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end right panel -->
+    </div><!-- end layout -->
+  </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ── TAB SWITCH ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.sec-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.s-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── ACCENT COLOUR ──
+  function pickAccent(el, color) {
+    document.querySelectorAll('.theme-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('accent-input').value = color;
+  }
+
+  // ── AVATAR ──
+  function pickAvatar(el, emoji) {
+    document.querySelectorAll('.av-opt').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('avatar-input').value = emoji;
+  }
+
+  // ── DANGER CONFIRM ──
+  function confirmClear(type) {
+    const labels = { journals: 'all journal entries', mood: 'all mood history' };
+    if (confirm('Are you sure you want to delete ' + labels[type] + '? This cannot be undone.')) {
+      showToast('🗑️', 'Cleared', 'Your ' + labels[type] + ' have been deleted.');
+    }
+  }
+
+  // ── SUCCESS TOAST ──
+  {% if messages %}
+  {% for message in messages %}
+  {% if 'success' in message.tags %}
+  showToast('⚙️', 'Settings saved!', '{{ message }}');
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+</script>
+{% endblock %}

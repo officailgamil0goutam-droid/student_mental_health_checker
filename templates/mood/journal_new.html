@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}New Journal Entry — MindMate{% endblock %}
+{% block nav_journal %}active{% endblock %}
+
+{% block extra_css %}
+.page { position: relative; z-index: 5; max-width: 800px; margin: 0 auto; padding: 40px 24px 100px; }
+.page-label { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--green); font-weight: 500; margin-bottom: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.page-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+.page-title { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; margin-bottom: 6px; }
+.page-sub   { font-size: .88rem; color: var(--muted); margin-bottom: 32px; }
+.back-link  { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: .82rem; margin-bottom: 28px; transition: color .2s; }
+.back-link:hover { color: var(--text); }
+.journal-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 36px; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+.form-group  { margin-bottom: 22px; }
+.form-label  { display: block; font-size: .75rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; letter-spacing: .04em; text-transform: uppercase; }
+.form-input  { width: 100%; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 16px; font-size: .92rem; color: var(--text); outline: none; transition: border-color .2s; font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+.form-input::placeholder { color: rgba(255,255,255,.2); }
+.form-input:focus { border-color: var(--purple); background: rgba(155,127,244,.05); box-shadow: 0 0 0 3px rgba(155,127,244,.1); }
+textarea.form-input { resize: vertical; min-height: 200px; line-height: 1.7; }
+.mood-label   { display: block; font-size: .75rem; font-weight: 600; color: var(--muted); margin-bottom: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.mood-options { display: flex; gap: 10px; flex-wrap: wrap; }
+.mood-btn { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 999px; padding: 9px 18px; font-size: .82rem; color: var(--muted); cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 7px; font-family: 'DM Sans', sans-serif; }
+.mood-btn:hover { border-color: rgba(155,127,244,.4); color: var(--text); background: var(--purple-faint); }
+.mood-btn.active { border-color: var(--purple); color: var(--purple); background: var(--purple-faint); }
+.mood-btn input { display: none; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.btn-cancel { background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 11px 26px; font-size: .88rem; color: var(--muted); text-decoration: none; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+.btn-cancel:hover { border-color: var(--border2); color: var(--text); }
+.btn-save { background: var(--purple); border: none; border-radius: 999px; padding: 11px 30px; font-size: .88rem; font-weight: 600; color: #fff; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; }
+.btn-save:hover { background: var(--purple-dim); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(155,127,244,.3); }
+.char-count { text-align: right; font-size: .72rem; color: var(--muted); margin-top: 6px; }
+.ai-note { display: inline-flex; align-items: center; gap: 6px; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.2); border-radius: 999px; padding: 6px 14px; font-size: .74rem; color: var(--purple); margin-bottom: 28px; }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <a href="{% url 'userboard' %}" class="back-link">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Dashboard
+  </a>
+  <div class="page-label">Your quiet corner on campus</div>
+  <h1 class="page-title">New Journal Entry</h1>
+  <p class="page-sub">Write freely — this is your safe space.</p>
+  <div class="ai-note">
+    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    AI will gently analyse your entry for insights
+  </div>
+  <div class="journal-card">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="title">Entry Title</label>
+        <input type="text" name="title" id="title" class="form-input" placeholder="Give your thoughts a name..." required>
+      </div>
+      <div class="form-group">
+        <label class="mood-label">How are you feeling right now?</label>
+        <div class="mood-options">
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="happy"> 😊 Happy</label>
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="calm"> 😌 Calm</label>
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="anxious"> 😟 Anxious</label>
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="sad"> 😢 Sad</label>
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="stressed"> 😤 Stressed</label>
+          <label class="mood-btn"><input type="radio" name="mood_tag" value="grateful"> 🙏 Grateful</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="content">What's on your mind?</label>
+        <textarea name="content" id="content" class="form-input" placeholder="Start writing... there's no right or wrong way to do this." required oninput="updateCount(this)"></textarea>
+        <div class="char-count" id="char-count">0 characters</div>
+      </div>
+      <hr class="divider">
+      <div class="form-actions">
+        <a href="{% url 'userboard' %}" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-save">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+          Save Entry
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function updateCount(el) {
+    document.getElementById('char-count').textContent = el.value.length + ' characters';
+  }
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+{% endblock %}

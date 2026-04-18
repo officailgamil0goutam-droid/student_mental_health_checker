@@ -116,7 +116,6 @@ def journal_new(request):
         return redirect('userboard')
     return render(request, 'mood/journal_new.html')
 
-
 @login_required
 def profile_view(request):
     user = request.user
@@ -149,6 +148,16 @@ def profile_view(request):
         'journal_count': JournalEntry.objects.filter(user=user).count(),
     }
     return render(request, 'mood/profile.html', context)
+    return render(request, 'mood/profile_view.html', context)
+
+@login_required
+def progress_view(request):
+    return render(request, 'mood/progress.html')
+
+
+@login_required
+def resources_view(request):
+    return render(request, 'mood/resources.html')
 
 
 @login_required
@@ -197,3 +206,18 @@ def chat(request):
     except Exception as e:
         print(f'Chat error: {e}')
         return JsonResponse({'reply': "I'm here with you. Something went wrong — could you say that again?"})
+      
+    
+
+@login_required
+def notifications(request):
+    return render(request, 'mood/notifications.html')
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        logout(request)
+        user.delete()
+        return redirect('login')
+    return render(request, 'mood/delete_account_confirm.html')

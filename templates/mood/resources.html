@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resources — MindMate{% endblock %}
+{% block nav_resources %}active{% endblock %}
+
+{% block extra_css %}
+.page { position: relative; z-index: 5; max-width: 1100px; margin: 0 auto; padding: 40px 24px 100px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+.page-title { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; margin-bottom: 6px; }
+.page-sub   { font-size: .88rem; color: var(--muted); margin-bottom: 36px; }
+
+/* CRISIS BANNER */
+.crisis-banner { background: linear-gradient(135deg,rgba(248,113,113,.08),rgba(251,191,36,.05)); border: 1px solid rgba(248,113,113,.2); border-radius: 18px; padding: 20px 24px; margin-bottom: 32px; display: flex; align-items: center; gap: 16px; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+.crisis-icon  { width: 44px; height: 44px; border-radius: 50%; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.crisis-text  { flex: 1; }
+.crisis-text strong { display: block; font-size: .9rem; color: var(--text); margin-bottom: 3px; }
+.crisis-text span   { font-size: .78rem; color: var(--muted); }
+.crisis-btn { padding: 9px 20px; border-radius: 999px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.3); color: var(--red); font-size: .8rem; font-weight: 600; text-decoration: none; white-space: nowrap; transition: all .2s; }
+.crisis-btn:hover { background: rgba(248,113,113,.2); }
+
+/* FILTER TABS */
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+.filter-tab  { padding: 7px 18px; border-radius: 999px; font-size: .8rem; color: var(--muted); border: 1px solid var(--border); background: transparent; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+.filter-tab:hover  { color: var(--text); border-color: var(--border2); }
+.filter-tab.active { background: var(--purple-faint); color: var(--purple); border-color: rgba(155,127,244,.3); }
+
+/* RESOURCES GRID */
+.resources-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.resource-card  { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; cursor: pointer; transition: all .2s; text-decoration: none; display: block; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+.resource-card:nth-child(2){animation-delay:.05s}.resource-card:nth-child(3){animation-delay:.1s}
+.resource-card:nth-child(4){animation-delay:.15s}.resource-card:nth-child(5){animation-delay:.2s}.resource-card:nth-child(6){animation-delay:.25s}
+.resource-card:hover { border-color: rgba(155,127,244,.3); background: rgba(155,127,244,.04); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.rc-icon  { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+.rc-tag   { display: inline-flex; padding: 2px 10px; border-radius: 999px; font-size: .68rem; font-weight: 600; margin-bottom: 10px; }
+.rc-title { font-size: .92rem; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+.rc-desc  { font-size: .76rem; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+.rc-link  { font-size: .74rem; color: var(--purple); display: flex; align-items: center; gap: 4px; }
+
+/* TAG COLORS */
+.tag-anxiety  { background: rgba(96,165,250,.1);  color: var(--blue);   }
+.tag-stress   { background: rgba(251,191,36,.1);  color: var(--amber);  }
+.tag-sleep    { background: rgba(155,127,244,.1); color: var(--purple); }
+.tag-crisis   { background: rgba(248,113,113,.08);color: var(--red);    }
+.tag-wellbeing{ background: var(--green-faint);   color: var(--green);  }
+.tag-study    { background: rgba(96,165,250,.1);  color: var(--blue);   }
+
+.icon-anxiety  { background: rgba(96,165,250,.1);  }
+.icon-stress   { background: rgba(251,191,36,.1);  }
+.icon-sleep    { background: rgba(155,127,244,.1); }
+.icon-crisis   { background: rgba(248,113,113,.08);}
+.icon-wellbeing{ background: var(--green-faint);   }
+.icon-study    { background: rgba(96,165,250,.1);  }
+
+/* HOTLINES */
+.hotlines-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 28px; margin-top: 32px; animation: fadeUp .4s .3s cubic-bezier(.22,1,.36,1) both; }
+.hotline-item  { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.hotline-item:last-child { border-bottom: none; padding-bottom: 0; }
+.hotline-emoji { font-size: 1.4rem; width: 36px; text-align: center; flex-shrink: 0; }
+.hotline-name  { font-size: .86rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.hotline-desc  { font-size: .74rem; color: var(--muted); }
+.hotline-num   { margin-left: auto; font-size: .86rem; font-weight: 600; color: var(--purple); white-space: nowrap; }
+
+@media(max-width:960px){ .resources-grid{grid-template-columns:1fr 1fr} }
+@media(max-width:600px){ .resources-grid{grid-template-columns:1fr} .crisis-banner{flex-direction:column;align-items:flex-start} }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <h1 class="page-title">Resources</h1>
+  <p class="page-sub">Helpful guides, tools, and support for your mental wellbeing.</p>
+
+  <!-- CRISIS BANNER -->
+  <div class="crisis-banner">
+    <div class="crisis-icon">🆘</div>
+    <div class="crisis-text">
+      <strong>In crisis right now?</strong>
+      <span>If you're having thoughts of self-harm, please reach out immediately. You are not alone.</span>
+    </div>
+    <a href="tel:9152987821" class="crisis-btn">Call iCall: 9152987821</a>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterCards('all', this)">All</button>
+    <button class="filter-tab" onclick="filterCards('anxiety', this)">Anxiety</button>
+    <button class="filter-tab" onclick="filterCards('stress', this)">Stress</button>
+    <button class="filter-tab" onclick="filterCards('sleep', this)">Sleep</button>
+    <button class="filter-tab" onclick="filterCards('wellbeing', this)">Wellbeing</button>
+    <button class="filter-tab" onclick="filterCards('study', this)">Study Tips</button>
+  </div>
+
+  <!-- RESOURCES GRID -->
+  <div class="resources-grid" id="resources-grid">
+
+    <a href="https://www.headspace.com" target="_blank" class="resource-card" data-cat="anxiety stress">
+      <div class="rc-icon icon-anxiety">🧘</div>
+      <div class="rc-tag tag-anxiety">Anxiety</div>
+      <div class="rc-title">Headspace — Guided Meditation</div>
+      <div class="rc-desc">Science-backed mindfulness and meditation exercises to calm your mind and reduce anxiety.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+    <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/" target="_blank" class="resource-card" data-cat="stress anxiety">
+      <div class="rc-icon icon-stress">💨</div>
+      <div class="rc-tag tag-stress">Stress</div>
+      <div class="rc-title">Breathing Exercises for Stress</div>
+      <div class="rc-desc">Simple breathing techniques from the NHS that can help you feel calmer in minutes.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+    <a href="https://www.sleepfoundation.org/sleep-hygiene" target="_blank" class="resource-card" data-cat="sleep">
+      <div class="rc-icon icon-sleep">🌙</div>
+      <div class="rc-tag tag-sleep">Sleep</div>
+      <div class="rc-title">Sleep Hygiene Guide</div>
+      <div class="rc-desc">Evidence-based tips to improve your sleep quality and build a healthy bedtime routine.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+    <a href="https://icallhelpline.org" target="_blank" class="resource-card" data-cat="crisis">
+      <div class="rc-icon icon-crisis">📞</div>
+      <div class="rc-tag tag-crisis">Crisis</div>
+      <div class="rc-title">iCall — Mental Health Helpline</div>
+      <div class="rc-desc">Free, confidential psychological support from trained counsellors. Available Mon–Sat.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+    <a href="https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/" target="_blank" class="resource-card" data-cat="wellbeing">
+      <div class="rc-icon icon-wellbeing">🌱</div>
+      <div class="rc-tag tag-wellbeing">Wellbeing</div>
+      <div class="rc-title">Five Ways to Wellbeing</div>
+      <div class="rc-desc">Simple, research-backed actions you can take every day to boost your mental health.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+    <a href="https://www.ucas.com/undergraduate/student-life/student-finance-and-budgeting/student-wellbeing/student-stress" target="_blank" class="resource-card" data-cat="study stress">
+      <div class="rc-icon icon-study">📚</div>
+      <div class="rc-tag tag-study">Study Tips</div>
+      <div class="rc-title">Managing Academic Stress</div>
+      <div class="rc-desc">Practical strategies to manage deadlines, exams, and the pressure of student life.</div>
+      <div class="rc-link">Visit resource <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+    </a>
+
+  </div>
+
+  <!-- HOTLINES -->
+  <div class="hotlines-card">
+    <div style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;margin-bottom:20px">Emergency Contacts</div>
+    <div class="hotline-item">
+      <div class="hotline-emoji">🇮🇳</div>
+      <div><div class="hotline-name">iCall</div><div class="hotline-desc">Psychological support helpline</div></div>
+      <div class="hotline-num">9152987821</div>
+    </div>
+    <div class="hotline-item">
+      <div class="hotline-emoji">🆘</div>
+      <div><div class="hotline-name">Vandrevala Foundation</div><div class="hotline-desc">24/7 mental health helpline</div></div>
+      <div class="hotline-num">1860-2662-345</div>
+    </div>
+    <div class="hotline-item">
+      <div class="hotline-emoji">💙</div>
+      <div><div class="hotline-name">NIMHANS</div><div class="hotline-desc">National Institute of Mental Health</div></div>
+      <div class="hotline-num">080-46110007</div>
+    </div>
+    <div class="hotline-item">
+      <div class="hotline-emoji">🌍</div>
+      <div><div class="hotline-name">Samaritans (UK)</div><div class="hotline-desc">Free confidential support</div></div>
+      <div class="hotline-num">116 123</div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function filterCards(cat, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.resource-card').forEach(card => {
+      const cats = card.dataset.cat || '';
+      card.style.display = (cat === 'all' || cats.includes(cat)) ? 'block' : 'none';
+    });
+  }
+</script>
+{% endblock %}

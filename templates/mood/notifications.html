@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications — MindMate{% endblock %}
+
+{% block nav_notifications %}active-page{% endblock %}
+
+{% block extra_css %}
+.page { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color: var(--muted); font-size: .81rem; font-weight: 500;
+  text-decoration: none; cursor: pointer;
+  transition: all .2s; margin-bottom: 24px;
+  font-family: 'DM Sans', sans-serif;
+  width: fit-content;
+}
+.back-btn:hover {
+  color: var(--text); border-color: var(--border2);
+  background: rgba(255,255,255,.08);
+  transform: translateX(-2px);
+}
+.back-btn svg { flex-shrink: 0; }
+
+/* ── HEADER ── */
+.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 14px; }
+.page-head-left h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-head-left p  { font-size: .83rem; color: var(--muted); }
+.mark-all-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: 999px;
+  background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3);
+  color: var(--purple); font-size: .81rem; font-weight: 500;
+  cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif;
+}
+.mark-all-btn:hover { background: rgba(155,127,244,.18); }
+
+/* ── FILTER TABS ── */
+.filter-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.f-tab {
+  padding: 6px 16px; border-radius: 999px; font-size: .79rem; font-weight: 500;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.f-tab:hover { color: var(--text); border-color: var(--border2); }
+.f-tab.active { background: var(--purple-faint); border-color: rgba(155,127,244,.35); color: var(--purple); }
+.f-tab .count {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(155,127,244,.2); font-size: .68rem; margin-left: 5px;
+}
+
+/* ── GROUP LABEL ── */
+.group-label {
+  font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+  margin: 24px 0 10px; padding-left: 4px;
+}
+
+/* ── NOTIF CARD ── */
+.notif-list { display: flex; flex-direction: column; gap: 8px; }
+.notif-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px;
+  cursor: pointer; transition: all .2s; position: relative;
+  text-decoration: none;
+}
+.notif-item:hover { border-color: var(--border2); background: rgba(255,255,255,.03); transform: translateX(3px); }
+.notif-item.unread { border-color: rgba(155,127,244,.25); background: rgba(155,127,244,.05); }
+.notif-item.unread:hover { border-color: rgba(155,127,244,.45); }
+
+/* unread dot */
+.unread-dot {
+  position: absolute; top: 18px; right: 16px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--purple);
+  box-shadow: 0 0 6px var(--purple);
+}
+
+/* icon bubble */
+.notif-icon {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.notif-icon.purple { background: var(--purple-faint); border: 1px solid rgba(155,127,244,.2); }
+.notif-icon.green  { background: var(--green-faint);  border: 1px solid rgba(74,222,128,.2); }
+.notif-icon.amber  { background: rgba(251,191,36,.1);  border: 1px solid rgba(251,191,36,.2); }
+.notif-icon.blue   { background: rgba(96,165,250,.1);  border: 1px solid rgba(96,165,250,.2); }
+.notif-icon.red    { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.2); }
+
+.notif-body { flex: 1; min-width: 0; padding-right: 18px; }
+.notif-title { font-size: .87rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.notif-item.unread .notif-title { color: #fff; }
+.notif-desc  { font-size: .79rem; color: var(--muted); line-height: 1.5; }
+.notif-time  { font-size: .72rem; color: rgba(136,136,170,.5); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; display: none;
+}
+.empty-state.show { display: block; }
+.empty-state .big-icon { font-size: 3rem; margin-bottom: 14px; }
+.empty-state h3 { font-size: 1rem; color: var(--text); margin-bottom: 6px; }
+.empty-state p  { font-size: .82rem; color: var(--muted); }
+
+/* ── CLEAR ALL ── */
+.clear-row { display: flex; justify-content: center; margin-top: 28px; }
+.clear-btn {
+  font-size: .78rem; color: var(--muted); background: none; border: none;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  display: inline-flex; align-items: center; gap: 6px; transition: color .2s;
+}
+.clear-btn:hover { color: var(--red); }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- ✅ BACK BUTTON -->
+  <a href="javascript:history.back()" class="back-btn">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Back
+  </a>
+
+  <!-- HEADER -->
+  <div class="page-head">
+    <div class="page-head-left">
+      <h1>🔔 Notifications</h1>
+      <p>Stay updated with your MindMate activity</p>
+    </div>
+    <button class="mark-all-btn" onclick="markAllRead()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Mark all as read
+    </button>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-row">
+    <button class="f-tab active" onclick="filterTab(this,'all')">All <span class="count" id="cnt-all">5</span></button>
+    <button class="f-tab" onclick="filterTab(this,'unread')">Unread <span class="count" id="cnt-unread">3</span></button>
+    <button class="f-tab" onclick="filterTab(this,'checkin')">Check-ins</button>
+    <button class="f-tab" onclick="filterTab(this,'journal')">Journal</button>
+    <button class="f-tab" onclick="filterTab(this,'streak')">Streaks</button>
+    <button class="f-tab" onclick="filterTab(this,'system')">System</button>
+  </div>
+
+  <!-- TODAY -->
+  <div class="group-label">Today</div>
+  <div class="notif-list" id="notif-list">
+
+    <div class="notif-item unread" data-type="checkin">
+      <div class="unread-dot"></div>
+      <div class="notif-icon green">✅</div>
+      <div class="notif-body">
+        <div class="notif-title">Daily check-in complete!</div>
+        <div class="notif-desc">Great job! You completed today's mental health check-in. Your score has been updated.</div>
+        <div class="notif-time">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Just now
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item unread" data-type="streak">
+      <div class="unread-dot"></div>
+      <div class="notif-icon amber">🔥</div>
+      <div class="notif-body">
+        <div class="notif-title">Streak milestone reached!</div>
+        <div class="notif-desc">You're on a <strong style="color:var(--amber)">3-day streak</strong>. Keep it up — consistency is key to mental wellness.</div>
+        <div class="notif-time">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          2 hours ago
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item unread" data-type="journal">
+      <div class="unread-dot"></div>
+      <div class="notif-icon purple">✍️</div>
+      <div class="notif-body">
+        <div class="notif-title">Journal reminder</div>
+        <div class="notif-desc">You haven't written in your journal today. Taking 5 minutes to reflect can boost your mood score.</div>
+        <div class="notif-time">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          4 hours ago
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EARLIER -->
+  <div class="group-label">Earlier</div>
+  <div class="notif-list">
+
+    <div class="notif-item" data-type="checkin">
+      <div class="notif-icon blue">📊</div>
+      <div class="notif-body">
+        <div class="notif-title">Weekly report ready</div>
+        <div class="notif-desc">Your weekly mental health summary is available. Your average score this week was <strong style="color:var(--purple)">72/100</strong>.</div>
+        <div class="notif-time">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Yesterday · 6:00 PM
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item" data-type="system">
+      <div class="notif-icon purple">🛡️</div>
+      <div class="notif-body">
+        <div class="notif-title">Welcome to MindMate</div>
+        <div class="notif-desc">Your account is set up and ready. Remember — always anonymous, never judgmental, always here.</div>
+        <div class="notif-time">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Apr 15 · 11:45 AM
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="empty-state">
+    <div class="big-icon">🔕</div>
+    <h3>No notifications here</h3>
+    <p>You're all caught up! Check back later.</p>
+  </div>
+
+  <!-- CLEAR ALL -->
+  <div class="clear-row" id="clear-row">
+    <button class="clear-btn" onclick="clearAll()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      Clear all notifications
+    </button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Filter tabs
+  function filterTab(el, type) {
+    document.querySelectorAll('.f-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.notif-item').forEach(item => {
+      if (type === 'all') {
+        item.style.display = 'flex';
+      } else if (type === 'unread') {
+        item.style.display = item.classList.contains('unread') ? 'flex' : 'none';
+      } else {
+        item.style.display = item.dataset.type === type ? 'flex' : 'none';
+      }
+    });
+    checkEmpty();
+  }
+
+  // Mark all read
+  function markAllRead() {
+    document.querySelectorAll('.notif-item.unread').forEach(item => {
+      item.classList.remove('unread');
+      const dot = item.querySelector('.unread-dot');
+      if (dot) dot.remove();
+    });
+    document.getElementById('cnt-unread').textContent = '0';
+    document.getElementById('cnt-all').textContent =
+      document.querySelectorAll('.notif-item').length;
+    showToast('✅', 'All caught up!', 'All notifications marked as read.');
+  }
+
+  // Click notif → mark read
+  document.querySelectorAll('.notif-item').forEach(item => {
+    item.addEventListener('click', function() {
+      if (this.classList.contains('unread')) {
+        this.classList.remove('unread');
+        const dot = this.querySelector('.unread-dot');
+        if (dot) dot.remove();
+        const unreadCount = document.querySelectorAll('.notif-item.unread').length;
+        document.getElementById('cnt-unread').textContent = unreadCount;
+      }
+    });
+  });
+
+  // Clear all
+  function clearAll() {
+    if (!confirm('Clear all notifications?')) return;
+    document.querySelectorAll('.notif-item').forEach(i => i.remove());
+    document.querySelectorAll('.group-label').forEach(l => l.remove());
+    document.getElementById('cnt-all').textContent = '0';
+    document.getElementById('cnt-unread').textContent = '0';
+    document.getElementById('empty-state').classList.add('show');
+    document.getElementById('clear-row').style.display = 'none';
+    showToast('🗑️', 'Cleared', 'All notifications removed.');
+  }
+
+  // Check if list is empty
+  function checkEmpty() {
+    const visible = [...document.querySelectorAll('.notif-item')]
+      .filter(i => i.style.display !== 'none');
+    document.getElementById('empty-state').classList.toggle('show', visible.length === 0);
+  }
+</script>
+{% endblock %}

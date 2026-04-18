@@ -31,6 +31,7 @@
   .nav-tab { padding: 7px 16px; border-radius: 999px; font-size: .83rem; color: var(--muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; }
   .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
   .nav-tab.active { background: var(--purple-faint); color: var(--purple); border: 1px solid rgba(155,127,244,.3); }
+  .nav-tab { pointer-events: all !important; }
   .nav-right { display: flex; align-items: center; gap: 12px; position: relative; }
   .notif-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: all .2s; position: relative; }
   .notif-btn:hover { color: var(--text); border-color: var(--border2); }
@@ -253,14 +254,14 @@
   <div class="nav-center">
     <a href="{% url 'userboard' %}" class="nav-tab active">Dashboard</a>
     <a href="{% url 'journal_new' %}" class="nav-tab">Journal</a>
-    <a href="{% url 'profile_view' %}" class="nav-tab">Progress</a>
-    <a href="#" class="nav-tab">Resources</a>
+    <a href="{% url 'progress' %}" class="nav-tab">Progress</a>
+    <a href="{% url 'resources' %}" class="nav-tab">Resources</a>
   </div>
   <div class="nav-right">
-    <div class="notif-btn">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="notif-dot"></div>
-    </div>
+   <a href="{% url 'notifications' %}" class="notif-btn" style="text-decoration:none">
+  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  <div class="notif-dot"></div>
+</a>
     <div class="user-pill" id="user-pill" onclick="toggleDropdown()">
       <div class="user-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
       <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>

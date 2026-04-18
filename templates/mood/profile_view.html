@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile — MindMate{% endblock %}
+
+{% block extra_css %}
+.page { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--muted); margin-bottom: 28px; }
+.breadcrumb a { color: var(--muted); text-decoration: none; transition: color .2s; }
+.breadcrumb a:hover { color: var(--purple); }
+.breadcrumb .sep { opacity: .35; }
+.breadcrumb .cur { color: var(--purple); }
+
+/* ── HERO CARD ── */
+.hero-card {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 32px;
+  display: flex; align-items: center; gap: 28px;
+  margin-bottom: 18px; position: relative; overflow: hidden;
+}
+.hero-card::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(155,127,244,.13) 0%, transparent 70%);
+  pointer-events: none;
+}
+.avatar-ring {
+  width: 96px; height: 96px; border-radius: 50%; flex-shrink: 0;
+  border: 3px solid var(--purple); box-shadow: 0 0 22px rgba(155,127,244,.3);
+  background: var(--purple-faint);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem;
+}
+.hero-info { flex: 1; min-width: 0; }
+.hero-info h1 { font-size: 1.6rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.hero-info .handle { font-size: .83rem; color: var(--muted); margin-bottom: 12px; }
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 999px; font-size: .74rem; font-weight: 500;
+}
+.badge.purple { background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); color: var(--purple); }
+.badge.green  { background: var(--green-faint);  border: 1px solid rgba(74,222,128,.2);  color: var(--green); }
+.badge.amber  { background: rgba(251,191,36,.1);  border: 1px solid rgba(251,191,36,.2);  color: var(--amber); }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; border-radius: 999px; font-size: .82rem; font-weight: 500;
+  cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: all .2s;
+  text-decoration: none;
+}
+.btn-primary { background: var(--purple); color: #fff; box-shadow: 0 4px 16px rgba(155,127,244,.35); }
+.btn-primary:hover { background: var(--purple-dim); transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
+.btn-ghost:hover { color: var(--text); border-color: rgba(155,127,244,.4); background: var(--purple-faint); }
+
+/* ── STATS ROW ── */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 18px; text-align: center;
+  transition: border-color .2s, transform .2s;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.stat-icon { font-size: 1.2rem; margin-bottom: 8px; }
+.stat-label { font-size: .68rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.stat-val { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: .72rem; color: var(--muted); }
+.stat-up { color: var(--green); font-size: .72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; }
+
+/* ── TWO COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+
+/* ── SECTION CARD ── */
+.sec-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px 26px; }
+.sec-card.full { grid-column: 1 / -1; }
+.sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.sec-title { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); min-width: 20px; }
+.sec-link { font-size: .75rem; color: var(--purple); text-decoration: none; }
+.sec-link:hover { text-decoration: underline; }
+
+/* ── INFO ROWS ── */
+.info-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-key { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.info-val { font-size: .82rem; color: var(--text); font-weight: 500; }
+
+/* ── MOOD HISTORY MINI ── */
+.mood-bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; }
+.mood-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mood-bar {
+  width: 100%; border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, var(--purple) 0%, var(--purple-dim) 100%);
+  opacity: .7; transition: opacity .2s;
+  min-height: 4px;
+}
+.mood-bar:hover { opacity: 1; }
+.mood-bar.empty { background: var(--border2); opacity: .4; }
+.mood-day { font-size: .62rem; color: var(--muted); }
+
+/* ── RECENT JOURNALS ── */
+.journal-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  text-decoration: none; transition: all .15s;
+}
+.journal-item:last-child { border-bottom: none; }
+.journal-item:hover .journal-title { color: var(--purple); }
+.journal-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); margin-top: 6px; flex-shrink: 0; opacity: .6; }
+.journal-title { font-size: .84rem; font-weight: 500; color: var(--text); margin-bottom: 3px; transition: color .2s; }
+.journal-meta  { font-size: .72rem; color: var(--muted); display: flex; gap: 10px; }
+
+/* ── MOOD EMOJI ROW ── */
+.mood-emoji-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mood-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px; font-size: .78rem;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+/* ── ACHIEVEMENTS ── */
+.achievement-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ach-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 10px; border-radius: 14px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  text-align: center; transition: all .2s;
+}
+.ach-item:hover { border-color: var(--border2); transform: translateY(-2px); }
+.ach-item.locked { opacity: .35; }
+.ach-emoji { font-size: 1.6rem; }
+.ach-name { font-size: .68rem; color: var(--muted); font-weight: 500; }
+
+@media (max-width: 650px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .hero-card { flex-direction: column; text-align: center; }
+  .hero-actions { justify-content: center; }
+  .badge-row { justify-content: center; }
+  .achievement-grid { grid-template-columns: repeat(2,1fr); }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="{% url 'userboard' %}">Dashboard</a>
+    <span class="sep">›</span>
+    <span class="cur">Profile</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero-card">
+    <div class="avatar-ring">{{ request.user.profile.avatar|default:"🌙" }}</div>
+    <div class="hero-info">
+      <h1>{{ request.user.get_full_name|default:request.user.username }}</h1>
+      <div class="handle">@{{ request.user.username }} · {{ request.user.email }}</div>
+      <div class="badge-row">
+        <span class="badge purple">🧠 MindMate Member</span>
+        <span class="badge green">✅ Active</span>
+        <span class="badge amber">🔥 {{ streak|default:"1" }} Day Streak</span>
+      </div>
+      <div class="hero-actions">
+        <a href="{% url 'profile_edit' %}" class="btn btn-primary">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Profile
+        </a>
+        <a href="{% url 'settings' %}" class="btn btn-ghost">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-label">Health Score</div>
+      <div class="stat-val">{{ avg_score|default:"—" }}</div>
+      <div class="stat-sub">out of 100</div>
+      {% if avg_score %}<div class="stat-up">↑ improving</div>{% endif %}
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-label">Best Streak</div>
+      <div class="stat-val">{{ best_streak|default:"0" }}</div>
+      <div class="stat-sub">days record</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-label">Total Check-ins</div>
+      <div class="stat-val">{{ total_checkins|default:"0" }}</div>
+      <div class="stat-sub">since joining</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✍️</div>
+      <div class="stat-label">Journal Entries</div>
+      <div class="stat-val">{{ total_journals|default:"0" }}</div>
+      <div class="stat-sub">entries written</div>
+    </div>
+  </div>
+
+  <!-- TWO COL -->
+  <div class="two-col">
+
+    <!-- ACCOUNT INFO -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <span class="sec-title">👤 Account Info</span>
+        <a href="{% url 'profile_edit' %}" class="sec-link">Edit →</a>
+      </div>
+      <div class="info-row">
+        <span class="info-key">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Username
+        </span>
+        <span class="info-val">@{{ request.user.username }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </span>
+        <span class="info-val">{{ request.user.email|default:"—" }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Joined
+        </span>
+        <span class="info-val">{{ request.user.date_joined|date:"d M Y" }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Last Login
+        </span>
+        <span class="info-val">{{ request.user.last_login|date:"d M Y"|default:"—" }}</span>
+      </div>
+      {% if request.user.profile.bio %}
+      <div class="info-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
+        <span class="info-key">📝 Bio</span>
+        <span class="info-val" style="font-size:.8rem; line-height:1.5; color:var(--muted);">{{ request.user.profile.bio }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- MOOD THIS WEEK -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <span class="sec-title">📊 Mood This Week</span>
+        <a href="{% url 'progress' %}" class="sec-link">View all →</a>
+      </div>
+      <div class="mood-bars">
+        {% for day in weekly_moods %}
+          <div class="mood-bar-wrap">
+            <div class="mood-bar {% if not day.score %}empty{% endif %}"
+                 style="height: {% if day.score %}{{ day.score }}%{% else %}10%{% endif %};"
+                 title="{{ day.label }}: {{ day.score|default:'No data' }}"></div>
+            <span class="mood-day">{{ day.short }}</span>
+          </div>
+        {% empty %}
+          {% for d in "MTWTFSS" %}
+          <div class="mood-bar-wrap">
+            <div class="mood-bar empty" style="height:10%;"></div>
+            <span class="mood-day">{{ d }}</span>
+          </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      <div style="margin-top:16px;">
+        <div class="sec-title" style="margin-bottom:10px;">Recent Moods</div>
+        <div class="mood-emoji-row">
+          <span class="mood-chip">😊 Good</span>
+          <span class="mood-chip">😐 Okay</span>
+          <span class="mood-chip">😔 Low</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT JOURNALS -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <span class="sec-title">✍️ Recent Journal</span>
+        <a href="{% url 'journal_new' %}" class="sec-link">New entry →</a>
+      </div>
+      {% for entry in recent_journals %}
+      <a href="#" class="journal-item">
+        <div class="journal-dot"></div>
+        <div>
+          <div class="journal-title">{{ entry.title|default:"Untitled Entry" }}</div>
+          <div class="journal-meta">
+            <span>{{ entry.created_at|date:"d M" }}</span>
+            <span>{{ entry.mood|default:"—" }}</span>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <div style="text-align:center; padding:20px 0; color:var(--muted); font-size:.82rem;">
+        No journal entries yet.<br>
+        <a href="{% url 'journal_new' %}" style="color:var(--purple); text-decoration:none; margin-top:6px; display:inline-block;">Write your first entry →</a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <span class="sec-title">🏆 Achievements</span>
+      </div>
+      <div class="achievement-grid">
+        <div class="ach-item {% if not total_checkins %}locked{% endif %}">
+          <div class="ach-emoji">🌱</div>
+          <div class="ach-name">First Check-in</div>
+        </div>
+        <div class="ach-item {% if best_streak < 3 %}locked{% endif %}">
+          <div class="ach-emoji">🔥</div>
+          <div class="ach-name">3 Day Streak</div>
+        </div>
+        <div class="ach-item {% if best_streak < 7 %}locked{% endif %}">
+          <div class="ach-emoji">⚡</div>
+          <div class="ach-name">Week Warrior</div>
+        </div>
+        <div class="ach-item {% if not total_journals %}locked{% endif %}">
+          <div class="ach-emoji">✍️</div>
+          <div class="ach-name">First Journal</div>
+        </div>
+        <div class="ach-item {% if total_journals < 5 %}locked{% endif %}">
+          <div class="ach-emoji">📖</div>
+          <div class="ach-name">Storyteller</div>
+        </div>
+        <div class="ach-item {% if avg_score < 80 %}locked{% endif %}">
+          <div class="ach-emoji">🌟</div>
+          <div class="ach-name">Top Score</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
