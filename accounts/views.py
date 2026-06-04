@@ -227,3 +227,7 @@ def reset_password(request):
         return JsonResponse({'success': False, 'error': 'User not found.'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+    
+
+def password_change(request):
+    return render(request, 'accounts/password_change.html')

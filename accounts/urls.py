@@ -12,6 +12,7 @@ urlpatterns = [
 
     # custom forgot password page
     path('forget_password/', views.forget_password, name='forget_password'),
+    path('password-change/', views.password_change, name='password_change'),
 
     # custom OTP API endpoints (called by forget_password.html via fetch)
     path('send-otp/', views.send_otp, name='send_otp'),

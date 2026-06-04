@@ -185,3 +185,6 @@ SOCIALACCOUNT_ADAPTER = 'accounts.adapters.SocialAccountAdapter'
 import logging
 logger = logging.getLogger('django')
 
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

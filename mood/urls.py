@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.dashboard, name='userboard'),
@@ -16,11 +15,4 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('chat/', views.chat, name='chat'),
     path('delete-account/', views.delete_account, name='delete_account'),
-    path('password-change/', auth_views.PasswordChangeView.as_view(
-        template_name='mood/change_password.html',
-        success_url='/mood/password-change/done/'
-    ), name='password_change'),
-    path('password-change/done/', auth_views.PasswordChangeDoneView.as_view(
-        template_name='mood/password_change_done.html'
-    ), name='password_change_done'),
 ]
