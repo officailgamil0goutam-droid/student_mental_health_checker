@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - MindMate</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0d0d1a;--card:#161626;--text:#f4f1ff;--muted:#8888aa;--border:rgba(255,255,255,.1);--purple:#9b7ff4;--purple-faint:rgba(155,127,244,.12);--green:#4ade80}
+    body.theme-light{--bg:#f6f7fb;--card:#ffffff;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981}
+    body.theme-calm{--bg:#10201d;--card:#172b27;--text:#f2fff9;--muted:#9bb9b0;--border:rgba(255,255,255,.1);--purple:#78dcca;--purple-faint:rgba(120,220,202,.12);--green:#34d399}
+    @media (prefers-color-scheme: light) {
+      body.theme-system{--bg:#f6f7fb;--card:#ffffff;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981}
+    }
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s, color 0.3s}.wrap{max-width:760px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:28px}.logo{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700}.logo-dot{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green))}.back{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:999px;padding:9px 13px;font-size:.85rem}.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;transition:background 0.3s, border-color 0.3s}h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:2.1rem;margin-bottom:6px}.muted{color:var(--muted);font-size:.9rem;margin-bottom:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px;margin-bottom:14px}.full{grid-column:1/-1}label{font-size:.78rem;color:var(--muted)}input,select{width:100%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;outline:none;transition:background 0.3s, color 0.3s}body.theme-light input,body.theme-light select{background:#fff}input:focus,select:focus{border-color:rgba(155,127,244,.55)}select option{background:var(--card);color:var(--text)}.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}.btn{border:0;border-radius:12px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--purple);color:white}.secondary{background:transparent;color:var(--muted);border:1px solid var(--border);text-decoration:none}@media(max-width:640px){.wrap{padding:18px}.top,.actions{align-items:stretch;flex-direction:column}.grid{grid-template-columns:1fr}h1{font-size:1.9rem}}
+  </style>
+</head>
+<body class="theme-{{ profile.theme }}">
+  <main class="wrap">
+    <div class="top">
+      <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span>MindMate</a>
+      <a class="back" href="{% url 'profile_view' %}">Back to profile</a>
+    </div>
+    <section class="panel">
+      <h1>Edit Profile</h1>
+      <p class="muted">Keep your student profile current so MindMate can personalize your dashboard.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="grid">
+          <div class="field">
+            <label for="first_name">First name</label>
+            <input id="first_name" name="first_name" value="{{ request.user.first_name }}" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label for="last_name">Last name</label>
+            <input id="last_name" name="last_name" value="{{ request.user.last_name }}" autocomplete="family-name">
+          </div>
+          <div class="field">
+            <label for="avatar">Avatar</label>
+            <select id="avatar" name="avatar">
+              <option value="🌙" {% if profile.avatar == "🌙" %}selected{% endif %}>🌙 Moon</option>
+              <option value="☀️" {% if profile.avatar == "☀️" %}selected{% endif %}>☀️ Sun</option>
+              <option value="⭐" {% if profile.avatar == "⭐" %}selected{% endif %}>⭐ Star</option>
+              <option value="🍀" {% if profile.avatar == "🍀" %}selected{% endif %}>🍀 Clover</option>
+              <option value="🌸" {% if profile.avatar == "🌸" %}selected{% endif %}>🌸 Blossom</option>
+              <option value="🌊" {% if profile.avatar == "🌊" %}selected{% endif %}>🌊 Wave</option>
+              <option value="🚀" {% if profile.avatar == "🚀" %}selected{% endif %}>🚀 Rocket</option>
+              <option value="🎓" {% if profile.avatar == "🎓" %}selected{% endif %}>🎓 Grad</option>
+              <option value="🎨" {% if profile.avatar == "🎨" %}selected{% endif %}>🎨 Art</option>
+              <option value="🐾" {% if profile.avatar == "🐾" %}selected{% endif %}>🐾 Paw</option>
+              <option value="☕" {% if profile.avatar == "☕" %}selected{% endif %}>☕ Coffee</option>
+              <option value="🌻" {% if profile.avatar == "🌻" %}selected{% endif %}>🌻 Flower</option>
+              <option value="M" {% if profile.avatar == "M" %}selected{% endif %}>M</option>
+              <option value="A" {% if profile.avatar == "A" %}selected{% endif %}>A</option>
+              <option value="S" {% if profile.avatar == "S" %}selected{% endif %}>S</option>
+              <option value="N" {% if profile.avatar == "N" %}selected{% endif %}>N</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pronouns">Pronouns</label>
+            <input id="pronouns" name="pronouns" value="{{ profile.pronouns }}" placeholder="she/her, he/him, they/them">
+          </div>
+          <div class="field full">
+            <label for="university">University</label>
+            <input id="university" name="university" value="{{ profile.university }}" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="year_of_study">Year of study</label>
+            <input id="year_of_study" name="year_of_study" value="{{ profile.year_of_study }}" placeholder="First year">
+          </div>
+          <div class="field">
+            <label for="subject_area">Subject area</label>
+            <input id="subject_area" name="subject_area" value="{{ profile.subject_area }}" placeholder="Computer Science">
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn secondary" href="{% url 'profile_view' %}">Cancel</a>
+          <button class="btn primary" type="submit">Save changes</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

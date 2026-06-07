@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - MindMate</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0d0d1a;--card:#161626;--card2:#1d1d32;--text:#f4f1ff;--muted:#8888aa;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--purple:#9b7ff4;--purple-faint:rgba(155,127,244,.12);--green:#4ade80;--amber:#fbbf24;--red:#fb7185}
+    body.theme-light{--bg:#f6f7fb;--card:#ffffff;--card2:#f1f3f8;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--border2:rgba(20,24,40,.18);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981;--amber:#d97706;--red:#f43f5e}
+    body.theme-calm{--bg:#10201d;--card:#172b27;--card2:#203934;--text:#f2fff9;--muted:#9bb9b0;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);--purple:#78dcca;--purple-faint:rgba(120,220,202,.12);--green:#34d399;--amber:#fbbf24;--red:#f87171}
+    @media (prefers-color-scheme: light) {
+      body.theme-system{--bg:#f6f7fb;--card:#ffffff;--card2:#f1f3f8;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--border2:rgba(20,24,40,.18);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981;--amber:#d97706;--red:#f43f5e}
+    }
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s, color 0.3s}.wrap{max-width:1080px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.logo{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700}.logo-dot{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green))}.nav{display:flex;gap:10px;flex-wrap:wrap}.nav a{color:var(--muted);text-decoration:none;font-size:.85rem;padding:9px 13px;border:1px solid var(--border);border-radius:999px}.nav a:hover,.nav .active{color:var(--purple);background:var(--purple-faint);border-color:rgba(155,127,244,.35)}.hero{display:flex;align-items:center;gap:18px;margin-bottom:22px}.avatar{width:72px;height:72px;border-radius:22px;background:var(--purple-faint);border:1px solid rgba(155,127,244,.35);display:flex;align-items:center;justify-content:center;font-size:2rem}.eyebrow{color:var(--purple);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}h1{font-family:'DM Serif Display',serif;font-size:2.3rem;font-weight:400}.muted{color:var(--muted);font-size:.9rem}.grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;transition:background 0.3s, border-color 0.3s}.panel h2{font-size:.95rem;margin-bottom:14px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;transition:background 0.3s, border-color 0.3s}.stat strong{display:block;font-size:1.45rem}.stat span{font-size:.75rem;color:var(--muted)}.info{display:grid;gap:10px}.row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--border)}.row:last-child{border-bottom:0}.row span{color:var(--muted);font-size:.82rem}.row strong{font-size:.9rem;text-align:right}.history{display:grid;gap:10px}.item{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;transition:background 0.3s, border-color 0.3s}.item-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}.score{color:var(--green);font-weight:700}.risk{font-size:.72rem;color:var(--muted)}.btn{display:inline-flex;align-items:center;justify-content:center;margin-top:16px;padding:10px 14px;border-radius:12px;border:1px solid rgba(155,127,244,.35);background:var(--purple-faint);color:var(--purple);text-decoration:none;font-weight:700;font-size:.85rem}@media(max-width:760px){.wrap{padding:18px}.top,.hero{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr}h1{font-size:1.9rem}}
+  </style>
+</head>
+<body class="theme-{{ profile.theme }}">
+  <main class="wrap">
+    <div class="top">
+      <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span>MindMate</a>
+      <nav class="nav">
+        <a href="{% url 'userboard' %}">Dashboard</a>
+        <a class="active" href="{% url 'profile_view' %}">Profile</a>
+        <a href="{% url 'profile_edit' %}">Edit</a>
+        <a href="{% url 'settings' %}">Settings</a>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <div class="avatar">{{ profile.avatar|default:"M" }}</div>
+      <div>
+        <div class="eyebrow">Student Profile</div>
+        <h1>{{ request.user.first_name|default:request.user.username }} {{ request.user.last_name }}</h1>
+        <p class="muted">{{ request.user.email|default:"No email added" }}</p>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Profile Details</h2>
+        <div class="info">
+          <div class="row"><span>Username</span><strong>{{ request.user.username }}</strong></div>
+          <div class="row"><span>University</span><strong>{{ profile.university|default:"Not set" }}</strong></div>
+          <div class="row"><span>Year</span><strong>{{ profile.year_of_study|default:"Not set" }}</strong></div>
+          <div class="row"><span>Subject</span><strong>{{ profile.subject_area|default:"Not set" }}</strong></div>
+          <div class="row"><span>Pronouns</span><strong>{{ profile.pronouns|default:"Not set" }}</strong></div>
+        </div>
+        <a class="btn" href="{% url 'profile_edit' %}">Edit profile</a>
+      </section>
+
+      <section class="panel">
+        <h2>Progress Snapshot</h2>
+        {% if show_progress_stats %}
+          <div class="stats">
+            <div class="stat"><strong>{{ total_checkins }}</strong><span>Total check-ins</span></div>
+            <div class="stat"><strong>{{ avg_score|default:"-" }}</strong><span>Average score</span></div>
+            <div class="stat"><strong>{{ streak }}</strong><span>Current streak</span></div>
+            <div class="stat"><strong>{{ longest_streak }}</strong><span>Best streak</span></div>
+          </div>
+        {% else %}
+          <p class="muted">Progress stats are hidden in your settings.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <section class="panel" style="margin-top:18px">
+      <h2>Check-in History</h2>
+      <div class="history">
+        {% for item in history %}
+          <div class="item">
+            <div class="item-top">
+              <strong>{{ item.checkin.date }}</strong>
+              <span class="score">{{ item.checkin.mental_health_score|floatformat:0 }}/100</span>
+            </div>
+            <p class="muted">Mood {{ item.checkin.mood_score }}/5, sleep {{ item.checkin.sleep_score }}/5, stress {{ item.checkin.stress_score }}/5</p>
+            {% if item.ai %}<p class="risk">AI risk: {{ item.ai.risk_level|default:"low" }}</p>{% endif %}
+          </div>
+        {% empty %}
+          <p class="muted">No check-ins yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

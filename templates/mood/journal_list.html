@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindMate — Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d1a; --card: #181830; --card2: #212142; --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12); --purple: #9b7ff4; --purple-dim: #7b5fd4;
+    --purple-faint: rgba(155,127,244,.1); --green: #4ade80;
+    --green-faint: rgba(74,222,128,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #e8e8f0;
+    --muted: #8888aa; --radius: 14px;
+  }
+  body.theme-light {
+    --bg: #f6f7fb; --card: #ffffff; --card2: #f1f3f8; --border: rgba(20,24,40,0.12);
+    --border2: rgba(20,24,40,0.18); --purple: #6d5df5; --purple-dim: #5c4df0;
+    --purple-faint: rgba(109,93,245,.1); --green: #10b981;
+    --green-faint: rgba(16,185,129,.1); --amber: #d97706;
+    --red: #f43f5e; --blue: #2563eb; --text: #171728;
+    --muted: #687085;
+  }
+  body.theme-calm {
+    --bg: #10201d; --card: #172b27; --card2: #203934; --border: rgba(255,255,255,0.1);
+    --border2: rgba(255,255,255,0.18); --purple: #78dcca; --purple-dim: #5cc2b0;
+    --purple-faint: rgba(120,220,202,.12); --green: #34d399;
+    --green-faint: rgba(52,211,153,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #f2fff9;
+    --muted: #9bb9b0;
+  }
+  @media (prefers-color-scheme: light) {
+    body.theme-system {
+      --bg: #f6f7fb; --card: #ffffff; --card2: #f1f3f8; --border: rgba(20,24,40,0.12);
+      --border2: rgba(20,24,40,0.18); --purple: #6d5df5; --purple-dim: #5c4df0;
+      --purple-faint: rgba(109,93,245,.1); --green: #10b981;
+      --green-faint: rgba(16,185,129,.1); --amber: #d97706;
+      --red: #f43f5e; --blue: #2563eb; --text: #171728;
+      --muted: #687085;
+    }
+  }
+
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(80,40,180,.25) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(20,100,80,.18) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  body.theme-light::before {
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(109,93,245,.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(16,185,129,.06) 0%, transparent 55%);
+  }
+  @media (prefers-color-scheme: light) {
+    body.theme-system::before {
+      background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(109,93,245,.08) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 40% at 0% 100%, rgba(16,185,129,.06) 0%, transparent 55%);
+    }
+  }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 40px; border-bottom: 1px solid var(--border); background: var(--bg); backdrop-filter: blur(16px); transition: background 0.3s, border-color 0.3s; }
+  .logo { display: flex; align-items: center; gap: 8px; font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+  .nav-center { display: flex; gap: 6px; }
+  .nav-tab { padding: 7px 16px; border-radius: 999px; font-size: .83rem; color: var(--muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; }
+  .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
+  body.theme-light .nav-tab:hover { background: rgba(0,0,0,.04); }
+  .nav-tab.active { background: var(--purple-faint); color: var(--purple); border: 1px solid rgba(155,127,244,.3); }
+  .nav-right { display: flex; align-items: center; gap: 12px; position: relative; }
+  .user-pill { display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); cursor: pointer; transition: all .2s; user-select: none; }
+  .user-pill:hover { border-color: var(--border2); background: rgba(255,255,255,.07); }
+  .user-pill.open { border-color: rgba(155,127,244,.4); background: var(--purple-faint); }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--purple-faint); border: 1px solid rgba(155,127,244,.3); display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+  .user-name { font-size: .84rem; font-weight: 500; color: var(--text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chevron { color: var(--muted); transition: transform .25s; }
+  .user-pill.open .chevron { transform: rotate(180deg); }
+  .user-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 220px; background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 8px; z-index: 200; box-shadow: 0 20px 60px rgba(0,0,0,.5); opacity: 0; transform: translateY(-8px) scale(.97); pointer-events: none; transition: all .2s cubic-bezier(.22,1,.36,1); }
+  .user-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+  .dd-header { padding: 10px 12px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .dd-avatar { font-size: 1.8rem; margin-bottom: 6px; }
+  .dd-name { font-size: .88rem; font-weight: 600; color: var(--text); }
+  .dd-email { font-size: .74rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: .84rem; color: var(--muted); cursor: pointer; text-decoration: none; transition: all .15s; }
+  .dd-item:hover { background: rgba(255,255,255,.06); color: var(--text); }
+  body.theme-light .dd-item:hover { background: rgba(0,0,0,.04); }
+  .dd-item.danger { color: var(--red); }
+  .dd-item.danger:hover { background: rgba(248,113,113,.08); }
+  .dd-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+  /* PAGE LAYOUT */
+  .page { position: relative; z-index: 5; max-width: 1000px; margin: 0 auto; padding: 36px 24px 80px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  /* HEADER */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; gap: 16px; flex-wrap: wrap; }
+  .header-info h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--text); margin-bottom: 6px; font-weight: 400; }
+  .header-info p { font-size: .88rem; color: var(--muted); }
+  
+  .btn-primary { padding: 11px 20px; background: var(--purple); border: none; border-radius: var(--radius); color:#fff; font-size:.88rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; display:inline-flex; align-items:center; gap:8px; transition:background .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 16px rgba(155,127,244,.25); text-decoration: none; }
+  .btn-primary:hover { background: var(--purple-dim); transform:translateY(-2px); box-shadow:0 6px 20px rgba(155,127,244,.35); }
+
+  /* CONTROLS */
+  .controls { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 28px; display: flex; flex-direction: column; gap: 14px; transition: background 0.3s, border-color 0.3s; }
+  .search-row { display: flex; gap: 12px; }
+  .search-box { flex: 1; position: relative; }
+  .search-box svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .search-input { width: 100%; padding: 11px 16px 11px 44px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: .88rem; outline: none; transition: border-color .2s, background-color .2s; }
+  body.theme-light .search-input { background: #fff; }
+  .search-input:focus { border-color: var(--purple); }
+  .btn-search { padding: 11px 20px; background: var(--purple-faint); border: 1px solid rgba(155,127,244,0.3); border-radius: 12px; color: var(--purple); font-size: .88rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+  .btn-search:hover { background: rgba(155,127,244,0.2); }
+
+  /* TAGS FILTER */
+  .tags-label { font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; margin-bottom: 2px; }
+  .mood-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mood-tag-filter { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.03); font-size: .78rem; color: var(--muted); text-decoration: none; cursor: pointer; transition: all .2s; }
+  body.theme-light .mood-tag-filter { background: rgba(0,0,0,0.02); }
+  .mood-tag-filter:hover { border-color: rgba(155,127,244,.4); color: var(--text); }
+  .mood-tag-filter.active { background: var(--purple-faint); border-color: var(--purple); color: var(--purple); font-weight: 500; }
+
+  /* ENTRIES LIST */
+  .entries-grid { display: flex; flex-direction: column; gap: 14px; }
+  .entry-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 10px; cursor: pointer; transition: background .2s, border-color .2s, transform .2s; animation: fadeUp .45s cubic-bezier(.22,1,.36,1) both; }
+  .entry-card:hover { border-color: var(--border2); background: rgba(255,255,255,0.02); transform: translateY(-2px); }
+  body.theme-light .entry-card:hover { background: rgba(0,0,0,0.01); }
+
+  .entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .entry-title { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: var(--text); font-weight: 400; }
+  .entry-date { font-size: .76rem; color: var(--muted); white-space: nowrap; margin-top: 4px; }
+  
+  .entry-preview { font-size: .88rem; color: var(--muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+
+  .entry-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; border-top: 1px solid var(--border); padding-top: 10px; }
+  
+  .mood-tag-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; font-size: .72rem; font-weight: 600; text-transform: capitalize; }
+  .mood-tag-pill.grateful { background: rgba(74,222,128,.1); color: var(--green); }
+  .mood-tag-pill.anxious { background: rgba(251,191,36,.1); color: var(--amber); }
+  .mood-tag-pill.hopeful { background: rgba(96,165,250,.1); color: var(--blue); }
+  .mood-tag-pill.sad { background: rgba(248,113,113,.08); color: var(--red); }
+  .mood-tag-pill.proud { background: var(--purple-faint); color: var(--purple); }
+  .mood-tag-pill.overwhelmed { background: rgba(251,191,36,.12); color: var(--amber); }
+  .mood-tag-pill.calm { background: rgba(74,222,128,.1); color: var(--green); }
+  .mood-tag-pill.angry { background: rgba(248,113,113,.12); color: var(--red); }
+  .mood-tag-pill.confused { background: rgba(136,136,170,.12); color: var(--muted); }
+  .mood-tag-pill.happy { background: rgba(251,191,36,.15); color: var(--amber); }
+
+  /* AI METADATA ON LIST CARD */
+  .entry-ai-meta { display: flex; align-items: center; gap: 12px; font-size: .76rem; color: var(--muted); }
+  .ai-indicator { display: inline-flex; align-items: center; gap: 4px; color: var(--purple); font-weight: 500; }
+  .ai-indicator svg { width: 12px; height: 12px; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 60px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 22px; animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+  .empty-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--purple-faint); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--purple); font-size: 1.8rem; }
+  .empty-state h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 8px; font-weight: 400; }
+  .empty-state p { font-size: .86rem; color: var(--muted); max-width: 320px; margin: 0 auto 20px; line-height: 1.6; }
+
+  @media(max-width: 760px) {
+    nav { padding: 14px 20px; }
+    .nav-center { display: none; }
+    .page { padding: 24px 16px 80px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .btn-primary { width: 100%; justify-content: center; }
+    .search-row { flex-direction: column; }
+    .btn-search { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body class="theme-{{ request.user.profile.theme }}">
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span> MindMate</a>
+  <div class="nav-center">
+    <a href="{% url 'userboard' %}" class="nav-tab">Dashboard</a>
+    <a href="{% url 'journal_list' %}" class="nav-tab active">Journal</a>
+    <a href="{% url 'profile_view' %}" class="nav-tab">Progress</a>
+    <a href="#" class="nav-tab">Resources</a>
+  </div>
+  <div class="nav-right">
+    <div class="user-pill" id="user-pill" onclick="toggleDropdown()">
+      <div class="user-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+      <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+      <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="user-dropdown" id="user-dropdown">
+      <div class="dd-header">
+        <div class="dd-avatar">{{ request.user.profile.avatar|default:"🌙" }}</div>
+        <div class="dd-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="dd-email">{{ request.user.email }}</div>
+      </div>
+      <a href="{% url 'profile_view' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>View Profile</a>
+      <a href="{% url 'profile_edit' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Profile</a>
+      <a href="{% url 'password_change' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Change Password</a>
+      <a href="{% url 'settings' %}" class="dd-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
+      <div class="dd-divider"></div>
+      <a href="{% url 'logout' %}" class="dd-item danger"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-info">
+      <h1>Your Journal</h1>
+      <p>Reflect on your thoughts, write freely. AI insights are generated upon saving.</p>
+    </div>
+    <a href="{% url 'journal_new' %}" class="btn-primary">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      New Journal Entry
+    </a>
+  </header>
+
+  <!-- CONTROLS (SEARCH & FILTER) -->
+  <section class="controls">
+    <form method="GET" action="{% url 'journal_list' %}">
+      <div class="search-row">
+        <div class="search-box">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" name="q" class="search-input" placeholder="Search by keywords or title..." value="{{ query|default:'' }}"/>
+        </div>
+        <button type="submit" class="btn-search">Search</button>
+      </div>
+    </form>
+    
+    <div>
+      <div class="tags-label">Filter by mood</div>
+      <div class="mood-tags">
+        <a href="?q={{ query|default:'' }}" class="mood-tag-filter {% if not selected_mood %}active{% endif %}">All Entries</a>
+        {% for value, label in mood_choices %}
+          <a href="?mood={{ value }}&q={{ query|default:'' }}" class="mood-tag-filter {% if selected_mood == value %}active{% endif %}">
+            {{ label }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTRIES GRID -->
+  <div class="entries-grid">
+    {% for entry in entries %}
+      <a class="entry-card" href="{% url 'journal_detail' entry.pk %}">
+        <div class="entry-top">
+          <h2 class="entry-title">{{ entry.title|default:"Untitled Entry" }}</h2>
+          <span class="entry-date">{{ entry.created_at|date:"M d, Y • H:i" }}</span>
+        </div>
+        
+        <p class="entry-preview">{{ entry.content }}</p>
+        
+        <div class="entry-bottom">
+          <div>
+            {% if entry.mood_tag %}
+              <span class="mood-tag-pill {{ entry.mood_tag }}">{{ entry.mood_tag }}</span>
+            {% endif %}
+          </div>
+          
+          <div class="entry-ai-meta">
+            {% if entry.ai_sentiment_score is not null %}
+              <span class="ai-indicator" title="AI analysis complete">
+                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 21h6v-1H9v1zm3-19C6.48 2 2 6.48 2 12c0 3.42 1.72 6.44 4.33 8.24l.04-.04c.3-.28.63-.52.99-.71v-.01A7.947 7.947 0 0 1 6 12c0-3.31 2.69-6 6-6s6 2.69 6 6c0 1.25-.39 2.41-1.04 3.37-.12.18-.26.34-.41.5-.06.06-.11.13-.17.19a3.84 3.84 0 0 0-.38.44c-.36.19-.69.43-.99.71-.24.23-.46.48-.65.76C16.28 18.44 18 15.42 18 12c0-5.52-4.48-10-10-10zm-2.06 13.5c.34-.34.61-.74.79-1.19.16-.4.27-.83.27-1.31h2c0 .82-.19 1.57-.5 2.22-.31.64-.78 1.19-1.36 1.58-.2-.3-.43-.58-.69-.8-.21.17-.44.31-.69.43-.44.22-.92.37-1.46.37v-2c.45 0 .84-.11 1.19-.27.26-.12.49-.26.69-.43z"/></svg>
+                AI Insights
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    {% empty %}
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h3>No journal entries found</h3>
+        <p>Start writing down your thoughts, reflections, or goals. Writing helps clear the mind.</p>
+        <a href="{% url 'journal_new' %}" class="btn-primary">Write your first entry</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function toggleDropdown() {
+    document.getElementById('user-dropdown').classList.toggle('open');
+    document.getElementById('user-pill').classList.toggle('open');
+  }
+  window.addEventListener('click', e => {
+    if (!document.getElementById('user-pill').contains(e.target) && !document.getElementById('user-dropdown').contains(e.target)) {
+      document.getElementById('user-dropdown').classList.remove('open');
+      document.getElementById('user-pill').classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>

@@ -4,6 +4,27 @@ from django.utils import timezone
 
 
 class UserProfile(models.Model):
+    THEME_CHOICES = [
+        ('system', 'Use device setting'),
+        ('dark', 'Dark'),
+        ('light', 'Light'),
+        ('calm', 'Calm'),
+    ]
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('hi', 'Hindi'),
+        ('ta', 'Tamil'),
+        ('bn', 'Bengali'),
+        ('te', 'Telugu'),
+        ('mr', 'Marathi'),
+    ]
+    SUPPORT_REGION_CHOICES = [
+        ('uk', 'United Kingdom'),
+        ('in', 'India'),
+        ('us', 'United States'),
+        ('global', 'Global'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     avatar = models.CharField(max_length=10, default='🌙')
     university = models.CharField(max_length=200, blank=True)
@@ -14,6 +35,17 @@ class UserProfile(models.Model):
     last_checkin_date = models.DateField(null=True, blank=True)
     total_checkins = models.IntegerField(default=0)
     joined_date = models.DateTimeField(default=timezone.now)
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default='dark')
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='en')
+    reduce_motion = models.BooleanField(default=False)
+    email_notifications = models.BooleanField(default=True)
+    checkin_reminders = models.BooleanField(default=True)
+    weekly_summary = models.BooleanField(default=True)
+    reminder_time = models.TimeField(null=True, blank=True)
+    ai_personalization = models.BooleanField(default=True)
+    private_profile = models.BooleanField(default=True)
+    show_progress_stats = models.BooleanField(default=True)
+    crisis_resources_region = models.CharField(max_length=20, choices=SUPPORT_REGION_CHOICES, default='uk')
 
     def __str__(self):
         return f"{self.user.username}'s profile"

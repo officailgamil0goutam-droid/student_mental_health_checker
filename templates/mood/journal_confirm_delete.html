@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Confirm Delete — {{ entry.title|default:"Journal Entry" }}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d1a; --card: #181830; --card2: #212142; --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12); --purple: #9b7ff4; --purple-dim: #7b5fd4;
+    --purple-faint: rgba(155,127,244,.1); --green: #4ade80;
+    --green-faint: rgba(74,222,128,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #e8e8f0;
+    --muted: #8888aa; --radius: 14px;
+  }
+  body.theme-light {
+    --bg: #f6f7fb; --card: #ffffff; --card2: #f1f3f8; --border: rgba(20,24,40,0.12);
+    --border2: rgba(20,24,40,0.18); --purple: #6d5df5; --purple-dim: #5c4df0;
+    --purple-faint: rgba(109,93,245,.1); --green: #10b981;
+    --green-faint: rgba(16,185,129,.1); --amber: #d97706;
+    --red: #f43f5e; --blue: #2563eb; --text: #171728;
+    --muted: #687085;
+  }
+  body.theme-calm {
+    --bg: #10201d; --card: #172b27; --card2: #203934; --border: rgba(255,255,255,0.1);
+    --border2: rgba(255,255,255,0.18); --purple: #78dcca; --purple-dim: #5cc2b0;
+    --purple-faint: rgba(120,220,202,.12); --green: #34d399;
+    --green-faint: rgba(52,211,153,.1); --amber: #fbbf24;
+    --red: #f87171; --blue: #60a5fa; --text: #f2fff9;
+    --muted: #9bb9b0;
+  }
+  @media (prefers-color-scheme: light) {
+    body.theme-system {
+      --bg: #f6f7fb; --card: #ffffff; --card2: #f1f3f8; --border: rgba(20,24,40,0.12);
+      --border2: rgba(20,24,40,0.18); --purple: #6d5df5; --purple-dim: #5c4df0;
+      --purple-faint: rgba(109,93,245,.1); --green: #10b981;
+      --green-faint: rgba(16,185,129,.1); --amber: #d97706;
+      --red: #f43f5e; --blue: #2563eb; --text: #171728;
+      --muted: #687085;
+    }
+  }
+
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; display: grid; place-items: center; padding: 24px; transition: background 0.3s ease, color 0.3s ease; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(80,40,180,.25) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(20,100,80,.18) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  body.theme-light::before {
+    background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(109,93,245,.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(16,185,129,.06) 0%, transparent 55%);
+  }
+  @media (prefers-color-scheme: light) {
+    body.theme-system::before {
+      background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(109,93,245,.08) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 40% at 0% 100%, rgba(16,185,129,.06) 0%, transparent 55%);
+    }
+  }
+
+  /* PANEL */
+  .panel { position: relative; z-index: 5; max-width: 500px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 36px 32px; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,.5); transition: background 0.3s, border-color 0.3s; }
+  
+  .icon-box { width: 64px; height: 64px; border-radius: 50%; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--red); }
+  .icon-box svg { width: 28px; height: 28px; }
+
+  h1 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--text); margin-bottom: 12px; font-weight: 400; }
+  p { font-size: .9rem; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+  p strong { color: var(--text); }
+
+  .entry-summary { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; text-align: left; }
+  body.theme-light .entry-summary { background: rgba(0,0,0,0.02); }
+  .entry-title { font-weight: 600; font-size: .92rem; color: var(--text); margin-bottom: 4px; }
+  .entry-preview { font-size: .82rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 12px; flex-direction: column; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; border-radius: var(--radius); font-size: .9rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; border: none; width: 100%; }
+  
+  .btn-danger { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(248,113,113,.2); }
+  .btn-danger:hover { background: #e11d48; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(248,113,113,.3); }
+  
+  .btn-cancel { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-cancel:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,.03); }
+  body.theme-light .btn-cancel:hover { background: rgba(0,0,0,.02); }
+
+  @media(max-width: 500px) {
+    .panel { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body class="theme-{{ request.user.profile.theme }}">
+
+<div class="panel">
+  <div class="icon-box">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+  </div>
+  
+  <h1>Delete journal entry?</h1>
+  <p>Are you sure you want to delete this entry? This action cannot be undone, and the AI sentiment insights associated with this entry will be removed.</p>
+
+  <div class="entry-summary">
+    <div class="entry-title">{{ entry.title|default:"Untitled Entry" }}</div>
+    <div class="entry-preview">{{ entry.content }}</div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="actions">
+      <button type="submit" class="btn btn-danger">Yes, Delete Entry</button>
+      <a href="{% url 'journal_detail' entry.pk %}" class="btn btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

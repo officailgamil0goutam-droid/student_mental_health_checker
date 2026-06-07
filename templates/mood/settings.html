@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - MindMate</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0d0d1a;--card:#161626;--card2:#1d1d32;--text:#f4f1ff;--muted:#8888aa;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.16);--purple:#9b7ff4;--purple-faint:rgba(155,127,244,.12);--green:#4ade80;--red:#fb7185}
+    body.theme-light{--bg:#f6f7fb;--card:#ffffff;--card2:#f1f3f8;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--border2:rgba(20,24,40,.18);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981;--red:#f43f5e;--amber:#d97706;--blue:#2563eb}
+    body.theme-calm{--bg:#10201d;--card:#172b27;--card2:#203934;--text:#f2fff9;--muted:#9bb9b0;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);--purple:#78dcca;--purple-faint:rgba(120,220,202,.12);--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#60a5fa}
+    @media (prefers-color-scheme: light) {
+      body.theme-system{--bg:#f6f7fb;--card:#ffffff;--card2:#f1f3f8;--text:#171728;--muted:#687085;--border:rgba(20,24,40,.12);--border2:rgba(20,24,40,.18);--purple:#6d5df5;--purple-faint:rgba(109,93,245,.1);--green:#10b981;--red:#f43f5e;--amber:#d97706;--blue:#2563eb}
+    }
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}.wrap{max-width:1060px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:28px}.logo{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700}.logo-dot{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green))}.back{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:999px;padding:9px 13px;font-size:.85rem}.header{margin-bottom:20px}.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:4px}h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:2.3rem}h2{font-size:1rem;margin-bottom:6px}.muted{color:var(--muted);font-size:.9rem;line-height:1.55}.layout{display:grid;grid-template-columns:220px 1fr;gap:18px}.side{position:sticky;top:18px;align-self:start;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px}.side a{display:block;color:var(--muted);text-decoration:none;padding:10px 12px;border-radius:10px;font-size:.86rem}.side a:hover{background:var(--purple-faint);color:var(--purple)}.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.field{display:grid;gap:7px}.full{grid-column:1/-1}label,.label{font-size:.78rem;color:var(--muted)}input,select{width:100%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;outline:none}body.theme-light input,body.theme-light select{background:#fff}select option{background:var(--card);color:var(--text)}input:focus,select:focus{border-color:rgba(155,127,244,.55)}.messages{display:grid;gap:8px;margin-bottom:16px}.msg{border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);font-size:.85rem}.toggles{display:grid;gap:10px;margin-top:16px}.toggle{display:flex;justify-content:space-between;gap:16px;align-items:center;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px}.toggle strong{display:block;font-size:.9rem;margin-bottom:2px}.toggle input{position:absolute;opacity:0;pointer-events:none}.switch{width:46px;height:26px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid var(--border2);position:relative;flex:0 0 auto}.switch:after{content:"";position:absolute;width:20px;height:20px;top:2px;left:2px;border-radius:50%;background:#fff;transition:.18s}.toggle input:checked + .switch{background:var(--purple)}.toggle input:checked + .switch:after{transform:translateX(20px)}.actions{display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:linear-gradient(180deg,rgba(13,13,26,0),var(--bg) 24%);padding-top:18px}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:12px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}.primary{background:var(--purple);color:white}.secondary{background:transparent;color:var(--muted);border:1px solid var(--border)}.danger{color:var(--red);border:1px solid rgba(251,113,133,.35);background:rgba(251,113,133,.08)}.security{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.note{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--card2);color:var(--muted);font-size:.84rem;line-height:1.55}@media(max-width:820px){.wrap{padding:18px}.top{align-items:stretch;flex-direction:column}.layout{grid-template-columns:1fr}.side{position:static;display:flex;overflow-x:auto}.side a{white-space:nowrap}.grid{grid-template-columns:1fr}.actions,.security{flex-direction:column}.btn{width:100%}h1{font-size:2rem}}@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}{% if profile.reduce_motion %}*{transition:none!important;scroll-behavior:auto!important}{% endif %}
+  </style>
+</head>
+<body class="theme-{{ profile.theme }}">
+  <main class="wrap">
+    <div class="top">
+      <a class="logo" href="{% url 'userboard' %}"><span class="logo-dot"></span>MindMate</a>
+      <a class="back" href="{% url 'userboard' %}">Back to dashboard</a>
+    </div>
+
+    <header class="header">
+      <div class="eyebrow">Account Center</div>
+      <h1>Settings</h1>
+      <p class="muted">Manage your account, reminders, privacy, AI personalization, and display preferences.</p>
+    </header>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}<div class="msg">{{ message }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="layout">
+        <nav class="side">
+          <a href="#account">Account</a>
+          <a href="#notifications">Notifications</a>
+          <a href="#appearance">Appearance</a>
+          <a href="#privacy">Privacy & AI</a>
+          <a href="#wellbeing">Wellbeing</a>
+          <a href="#security">Security</a>
+        </nav>
+
+        <div>
+          <section class="panel" id="account">
+            <h2>Account</h2>
+            <p class="muted">Update your sign-in identity.</p>
+            <div class="grid">
+              <div class="field">
+                <label for="username">Username</label>
+                <input id="username" name="username" value="{{ request.user.username }}" required autocomplete="username">
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" value="{{ request.user.email }}" required autocomplete="email">
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="notifications">
+            <h2>Notifications</h2>
+            <p class="muted">Choose which reminders MindMate should send when email is configured.</p>
+            <div class="toggles">
+              <label class="toggle">
+                <span><strong>Email notifications</strong><span class="muted">Allow account and wellbeing emails.</span></span>
+                <input type="checkbox" name="email_notifications" {% if profile.email_notifications %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+              <label class="toggle">
+                <span><strong>Daily check-in reminders</strong><span class="muted">A gentle nudge to complete your daily check-in.</span></span>
+                <input type="checkbox" name="checkin_reminders" {% if profile.checkin_reminders %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+              <label class="toggle">
+                <span><strong>Weekly summary</strong><span class="muted">Receive a short summary of your mood patterns.</span></span>
+                <input type="checkbox" name="weekly_summary" {% if profile.weekly_summary %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label for="reminder_time">Preferred reminder time</label>
+                <input id="reminder_time" name="reminder_time" type="time" value="{{ profile.reminder_time|time:'H:i' }}">
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="appearance">
+            <h2>Appearance</h2>
+            <p class="muted">Adjust how the dashboard should feel on this account.</p>
+            <div class="grid">
+              <div class="field">
+                <label for="theme">Theme</label>
+                <select id="theme" name="theme">
+                  {% for value,label in profile.THEME_CHOICES %}
+                    <option value="{{ value }}" {% if profile.theme == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label for="language">Language</label>
+                <select id="language" name="language">
+                  {% for value,label in profile.LANGUAGE_CHOICES %}
+                    <option value="{{ value }}" {% if profile.language == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="toggles">
+              <label class="toggle">
+                <span><strong>Reduce motion</strong><span class="muted">Limit interface animations and transitions.</span></span>
+                <input type="checkbox" name="reduce_motion" {% if profile.reduce_motion %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel" id="privacy">
+            <h2>Privacy & AI</h2>
+            <p class="muted">Control how your progress and AI context are used inside MindMate.</p>
+            <div class="toggles">
+              <label class="toggle">
+                <span><strong>Private profile</strong><span class="muted">Keep your profile and progress visible only to you.</span></span>
+                <input type="checkbox" name="private_profile" {% if profile.private_profile %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+              <label class="toggle">
+                <span><strong>Show progress stats</strong><span class="muted">Display check-in stats on profile and dashboard pages.</span></span>
+                <input type="checkbox" name="show_progress_stats" {% if profile.show_progress_stats %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+              <label class="toggle">
+                <span><strong>AI personalization</strong><span class="muted">Let chat use your recent check-ins and journals for context.</span></span>
+                <input type="checkbox" name="ai_personalization" {% if profile.ai_personalization %}checked{% endif %}>
+                <span class="switch"></span>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel" id="wellbeing">
+            <h2>Wellbeing Resources</h2>
+            <p class="muted">Choose which support-region resources MindMate should prioritize.</p>
+            <div class="grid">
+              <div class="field">
+                <label for="crisis_resources_region">Support region</label>
+                <select id="crisis_resources_region" name="crisis_resources_region">
+                  {% for value,label in profile.SUPPORT_REGION_CHOICES %}
+                    <option value="{{ value }}" {% if profile.crisis_resources_region == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="note">MindMate is not a substitute for professional care. If you are in immediate danger, contact local emergency services.</div>
+          </section>
+
+          <section class="panel" id="security">
+            <h2>Security</h2>
+            <p class="muted">Manage password and session actions.</p>
+            <div class="security">
+              <a class="btn secondary" href="{% url 'password_change' %}">Change password</a>
+              <a class="btn danger" href="{% url 'logout' %}">Log out</a>
+            </div>
+          </section>
+
+          <div class="actions">
+            <a class="btn secondary" href="{% url 'userboard' %}">Cancel</a>
+            <button class="btn primary" type="submit">Save settings</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
