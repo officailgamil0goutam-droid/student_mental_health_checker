@@ -18,9 +18,11 @@
 
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
 .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px 22px; animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both; text-align: center; }
-.stat-card:nth-child(2){animation-delay:.05s}.stat-card:nth-child(3){animation-delay:.1s}.stat-card:nth-child(4){animation-delay:.15s}
-.stat-num  { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; line-height: 1; margin-bottom: 4px; }
-.stat-lbl  { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.stat-card:nth-child(2){animation-delay:.05s}
+.stat-card:nth-child(3){animation-delay:.10s}
+.stat-card:nth-child(4){animation-delay:.15s}
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff; line-height: 1; margin-bottom: 4px; }
+.stat-lbl { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 
 .section-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: #fff; margin-bottom: 16px; }
 
@@ -37,7 +39,11 @@
 .risk-high   { background: rgba(248,113,113,.08); color: var(--red); }
 .empty-state { text-align: center; padding: 40px 0; color: var(--muted); font-size: .88rem; }
 
-@media(max-width:760px){ .stats-grid{grid-template-columns:1fr 1fr} .profile-header{flex-direction:column;align-items:flex-start} .btn-edit{margin-left:0} }
+@media(max-width:760px){
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .profile-header { flex-direction: column; align-items: flex-start; }
+  .btn-edit { margin-left: 0; }
+}
 {% endblock %}
 
 {% block content %}
@@ -50,10 +56,18 @@
       <h1>{{ request.user.get_full_name|default:request.user.username }}</h1>
       <p>{{ request.user.email }}</p>
       <div class="profile-tags">
-        {% if profile.university %}<span class="profile-tag">🎓 {{ profile.university }}</span>{% endif %}
-        {% if profile.year_of_study %}<span class="profile-tag">📅 Year {{ profile.year_of_study }}</span>{% endif %}
-        {% if profile.subject_area %}<span class="profile-tag">📚 {{ profile.subject_area }}</span>{% endif %}
-        {% if profile.pronouns %}<span class="profile-tag">{{ profile.pronouns }}</span>{% endif %}
+        {% if profile.university %}
+          <span class="profile-tag">🎓 {{ profile.university }}</span>
+        {% endif %}
+        {% if profile.year_of_study %}
+          <span class="profile-tag">📅 Year {{ profile.year_of_study }}</span>
+        {% endif %}
+        {% if profile.subject_area %}
+          <span class="profile-tag">📚 {{ profile.subject_area }}</span>
+        {% endif %}
+        {% if profile.pronouns %}
+          <span class="profile-tag">{{ profile.pronouns }}</span>
+        {% endif %}
       </div>
     </div>
     <a href="{% url 'profile_edit' %}" class="btn-edit">✏️ Edit Profile</a>
@@ -79,7 +93,7 @@
     </div>
   </div>
 
-  <!-- HISTORY -->
+  <!-- CHECK-IN HISTORY -->
   <div class="history-card">
     <div class="section-title">Check-in History</div>
     {% if history %}
@@ -91,14 +105,20 @@
             Score: {{ item.checkin.mental_health_score|default:"—" }}/100
             {% if item.ai %}
             <span class="risk-pill risk-{{ item.ai.risk_level|default:'low' }}">
-              {% if item.ai.risk_level == 'high' %}⚠ High{% elif item.ai.risk_level == 'medium' %}~ Medium{% else %}✓ Low{% endif %}
+              {% if item.ai.risk_level == 'high' %}
+                ⚠ High
+              {% elif item.ai.risk_level == 'medium' %}
+                ~ Medium
+              {% else %}
+                ✓ Low
+              {% endif %}
             </span>
             {% endif %}
           </div>
           {% if item.ai and item.ai.insight %}
-          <div class="history-insight">{{ item.ai.insight|truncatechars:120 }}</div>
+            <div class="history-insight">{{ item.ai.insight|truncatechars:120 }}</div>
           {% elif item.checkin.mood_note %}
-          <div class="history-insight">{{ item.checkin.mood_note|truncatechars:120 }}</div>
+            <div class="history-insight">{{ item.checkin.mood_note|truncatechars:120 }}</div>
           {% endif %}
         </div>
       </div>
@@ -106,7 +126,9 @@
     {% else %}
       <div class="empty-state">
         No check-ins yet.<br>
-        <a href="{% url 'userboard' %}" style="color:var(--purple);text-decoration:none">Complete your first check-in →</a>
+        <a href="{% url 'userboard' %}" style="color:var(--purple);text-decoration:none">
+          Complete your first check-in →
+        </a>
       </div>
     {% endif %}
   </div>

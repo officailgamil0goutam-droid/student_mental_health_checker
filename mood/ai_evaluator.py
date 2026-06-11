@@ -1,84 +1,190 @@
 import json
-from google import genai
-from django.conf import settings
-from .models import DailyCheckIn, MentalHealthScore
+import time
+
+from decouple import config
 from django.utils import timezone
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash-lite'
+FALLBACK_GEMINI_MODELS = ('gemini-2.5-flash', 'gemini-2.0-flash')
+
+
+def _get_client():
+    from google import genai
+    return genai.Client(api_key=config('GEMINI_API_KEY').strip())
+
+
+def _get_models():
+    configured = config('GEMINI_MODEL', default=DEFAULT_GEMINI_MODEL).strip()
+    models = [configured, *FALLBACK_GEMINI_MODELS]
+    return list(dict.fromkeys([model for model in models if model]))
+
+
+def _is_rate_limit_error(error):
+    return '429' in str(error) or 'RESOURCE_EXHAUSTED' in str(error)
+
+
+def _friendly_checkin_fallback(checkin):
+    recommendations = [
+        'Take a short break and drink some water.',
+        'Try a two-minute breathing exercise before your next task.',
+    ]
+    if checkin.stress_score <= 2:
+        recommendations[0] = 'Pause for five minutes and write down the one thing that feels heaviest right now.'
+    if checkin.sleep_score <= 2:
+        recommendations[1] = 'Protect one small sleep habit tonight, like dimming screens before bed.'
+    return {
+        'insight': 'Thanks for checking in. Your responses suggest it may help to slow things down and focus on one manageable next step today.',
+        'risk_level': 'low',
+        'risk_reason': 'AI quota was unavailable, so this is a basic supportive fallback.',
+        'recommendations': recommendations,
+    }
+
+
+def _call_gemini(prompt, retries=3):
+    from google.genai import types
+    client = _get_client()
+    last_error = None
+
+    for model in _get_models():
+        for attempt in range(retries):
+            try:
+                response = client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type='application/json',
+                        max_output_tokens=1000,
+                    ),
+                )
+                return response.text
+            except Exception as e:
+                last_error = e
+                if _is_rate_limit_error(e):
+                    print(f'[AI] Model {model} is rate limited or out of quota.')
+                    break
+                if attempt < retries - 1:
+                    wait = attempt + 1
+                    print(f'[AI] Gemini call failed on {model}. Retrying in {wait}s...')
+                    time.sleep(wait)
+                else:
+                    raise e
+
+    raise Exception(f'Gemini unavailable for all configured models: {last_error}')
+
+
+def call_ai_chat(system_prompt, messages_list):
+    from google.genai import types
+    client = _get_client()
+
+    try:
+        history_for_gemini = []
+        for msg in messages_list[:-1]:
+            role = 'user' if msg['role'] == 'user' else 'model'
+            history_for_gemini.append({
+                'role': role,
+                'parts': [{'text': msg['content']}],
+            })
+
+        last_message = messages_list[-1]['content']
+        last_error = None
+
+        for model in _get_models():
+            try:
+                chat = client.chats.create(
+                    model=model,
+                    config=types.GenerateContentConfig(system_instruction=system_prompt),
+                    history=history_for_gemini,
+                )
+                response = chat.send_message(last_message)
+                return response.text
+            except Exception as e:
+                last_error = e
+                if _is_rate_limit_error(e):
+                    print(f'[AI CHAT] Model {model} is rate limited or out of quota.')
+                    continue
+                raise e
+
+        raise Exception(f'Gemini chat unavailable for all configured models: {last_error}')
+
+    except Exception as e:
+        import traceback
+        if _is_rate_limit_error(e):
+            return 'I am here with you. The AI service is out of quota right now, but you can try again in a little while.'
+        print(f'[AI CHAT ERROR] {e}')
+        traceback.print_exc()
+        return 'I am here with you. Something went wrong. Could you say that again?'
+
+
+def _build_prompt(checkin, journal_entries=None):
+    journal_text = ''
+    if journal_entries:
+        entries = '\n'.join([
+            f"- [{e.created_at.date()}] {e.title or 'Untitled'}: {e.content[:200]}"
+            for e in journal_entries
+        ])
+        journal_text = f'\nRecent journal entries:\n{entries}'
+
+    return f"""You are a compassionate mental health support assistant for university students.
+Analyze this student's daily check-in and provide supportive, non-clinical feedback.
+
+Today's check-in scores (1=worst, 5=best):
+- Mood: {checkin.mood_score}/5 ({checkin.get_mood_score_display()})
+- Sleep: {checkin.sleep_score}/5 ({checkin.get_sleep_score_display()})
+- Stress: {checkin.stress_score}/5 ({checkin.get_stress_score_display()})
+- Social: {checkin.social_score}/5 ({checkin.get_social_score_display()})
+- Energy: {checkin.energy_score}/5 ({checkin.get_energy_score_display()})
+- Overall computed score: {checkin.mental_health_score:.1f}/100
+{f'- Note from student: "{checkin.mood_note}"' if checkin.mood_note else ''}
+{journal_text}
+
+Respond ONLY with a valid JSON object, no extra text:
+{{
+  "insight": "A warm 2-3 sentence paragraph acknowledging how they feel.",
+  "risk_level": "low",
+  "risk_reason": "",
+  "recommendations": ["tip 1", "tip 2", "tip 3"]
+}}
+
+Risk level: low=scores mostly 3-5, medium=multiple 2s, high=any 1s or distressing note.""".strip()
+
+
+def _parse_response(raw):
+    try:
+        clean = raw.strip()
+        if '```' in clean:
+            lines = [l for l in clean.split('\n') if not l.strip().startswith('```')]
+            clean = '\n'.join(lines).strip()
+        return json.loads(clean)
+    except Exception as e:
+        print(f'[AI] Parse failed: {e}')
+        return None
 
 
 def evaluate_checkin(checkin, recent_journals=None):
     try:
-        mood_map   = {1:'Very Low', 2:'Low', 3:'Neutral', 4:'Good', 5:'Great'}
-        sleep_map  = {1:'Less than 4 hrs', 2:'4-6 hrs', 3:'6-7 hrs', 4:'7-8 hrs', 5:'8+ hrs'}
-        stress_map = {1:'Very High', 2:'High', 3:'Moderate', 4:'Low', 5:'None'}
-        social_map = {1:'Very isolated', 2:'Somewhat isolated', 3:'Neutral', 4:'Connected', 5:'Very connected'}
-        energy_map = {1:'Exhausted', 2:'Tired', 3:'Okay', 4:'Energised', 5:'Very energised'}
-
-        journal_context = ''
-        if recent_journals:
-            entries = []
-            for j in recent_journals:
-                entries.append(f"- [{j.created_at.date()}] {j.title or 'Untitled'}: {j.content[:200]}")
-            if entries:
-                journal_context = '\n\nRecent journal entries:\n' + '\n'.join(entries)
-
-        prompt = f"""You are MindMate, a compassionate mental health support AI for university students.
-
-A student has completed their daily check-in:
-- Mood: {mood_map.get(checkin.mood_score, 'Unknown')}
-- Sleep: {sleep_map.get(checkin.sleep_score, 'Unknown')}
-- Stress: {stress_map.get(checkin.stress_score, 'Unknown')}
-- Social connection: {social_map.get(checkin.social_score, 'Unknown')}
-- Energy: {energy_map.get(checkin.energy_score, 'Unknown')}
-- Note: "{checkin.mood_note or 'None'}"
-- Mental health score: {round(checkin.mental_health_score or 0)}/100
-{journal_context}
-
-Respond ONLY with a valid JSON object (no markdown, no backticks):
-{{
-  "insight": "A warm, empathetic 2-3 sentence insight about their current state",
-  "risk_level": "low",
-  "risk_reason": "",
-  "recommendations": ["recommendation 1", "recommendation 2", "recommendation 3"]
-}}
-
-risk_level must be exactly: "low", "medium", or "high"
-- high: clear signs of crisis
-- medium: mood <= 2 or stress >= 4
-- low: otherwise"""
-
-        response = client.models.generate_content(
-            model='gemini-1.5-flash',
-            contents=prompt
-        )
-        text = response.text.strip()
-
-        if text.startswith('```'):
-            text = text.split('```')[1]
-            if text.startswith('json'):
-                text = text[4:]
-        text = text.strip()
-
-        data = json.loads(text)
-
-        checkin.ai_insight   = json.dumps(data)
-        checkin.ai_risk_flag = data.get('risk_level') == 'high'
-        checkin.save()
-
-        _update_weekly_score(checkin.user)
-        return data
-
+        prompt = _build_prompt(checkin, recent_journals)
+        raw = _call_gemini(prompt)
+        result = _parse_response(raw)
     except Exception as e:
-        print(f'AI evaluation failed: {e}')
-        return None
+        print(f'[EVAL ERROR] {e}')
+        result = _friendly_checkin_fallback(checkin)
+
+    if result:
+        checkin.ai_insight = json.dumps(result)
+        checkin.ai_risk_flag = result.get('risk_level') == 'high'
+        checkin.save()
+        _update_weekly_score(checkin.user)
+        return result
+    return None
 
 
 def _update_weekly_score(user):
     try:
-        today      = timezone.now().date()
+        from .models import DailyCheckIn, MentalHealthScore
+        today = timezone.now().date()
         week_start = today - timezone.timedelta(days=today.weekday())
-        checkins   = DailyCheckIn.objects.filter(user=user, date__gte=week_start)
+        checkins = DailyCheckIn.objects.filter(user=user, date__gte=week_start)
 
         if not checkins.exists():
             return
@@ -107,63 +213,72 @@ def _update_weekly_score(user):
 
 
 def _build_chat_system_prompt(user):
-    try:
-        profile  = user.profile
-        checkins = user.checkins.order_by('-date')[:5]
-        journals = user.journal_entries.order_by('-created_at')[:3]
+    from .models import DailyCheckIn, JournalEntry, Streak
 
-        checkin_summary = ''
-        if checkins.exists():
-            latest   = checkins.first()
-            mood_map = {1:'Very Low', 2:'Low', 3:'Neutral', 4:'Good', 5:'Great'}
-            checkin_summary = f"""
-Latest check-in ({latest.date}):
-- Mood: {mood_map.get(latest.mood_score, 'Unknown')}
-- Score: {round(latest.mental_health_score or 0)}/100
-- Note: "{latest.mood_note or 'None'}"
-"""
+    profile = getattr(user, 'profile', None)
+    if profile and not profile.ai_personalization:
+        return f"""You are MindMate, a compassionate AI mental health companion for university students.
+Keep responses to 2-4 sentences max.
+Never diagnose or give clinical advice.
+If crisis is mentioned, gently suggest appropriate emergency or crisis support.
 
-        journal_summary = ''
-        if journals.exists():
-            entries = [f"- {j.title or 'Untitled'} ({j.created_at.date()}): {j.content[:150]}" for j in journals]
-            journal_summary = '\nRecent journals:\n' + '\n'.join(entries)
+User: {user.first_name or user.username}"""
 
-        return f"""You are MindMate AI, a compassionate mental health companion for university students.
+    latest = DailyCheckIn.objects.filter(user=user).first()
+    checkin_ctx = ''
+    ai_ctx = ''
+    if latest:
+        checkin_ctx = f"""
+Today's check-in ({latest.date}):
+- Mood: {latest.mood_score}/5 ({latest.get_mood_score_display()})
+- Sleep: {latest.sleep_score}/5 ({latest.get_sleep_score_display()})
+- Stress: {latest.stress_score}/5 ({latest.get_stress_score_display()})
+- Social: {latest.social_score}/5 ({latest.get_social_score_display()})
+- Energy: {latest.energy_score}/5 ({latest.get_energy_score_display()})
+- Overall: {latest.mental_health_score:.1f}/100
+{f'- Note: "{latest.mood_note}"' if latest.mood_note else ''}"""
+        if latest.ai_insight:
+            try:
+                ai_data = json.loads(latest.ai_insight)
+                ai_ctx = f"\nAI evaluation: risk={ai_data.get('risk_level', 'low')}, insight={ai_data.get('insight', '')}"
+            except Exception:
+                pass
 
-Student profile:
-- Name: {user.first_name or user.username}
-- University: {profile.university or 'Not specified'}
-- Year: {profile.year_of_study or 'Not specified'}
-- Subject: {profile.subject_area or 'Not specified'}
-{checkin_summary}{journal_summary}
+    journal_ctx = ''
+    journals = JournalEntry.objects.filter(user=user).order_by('-created_at')[:3]
+    if journals.exists():
+        entries = [f"- {j.title or 'Untitled'} ({j.created_at.date()}): {j.content[:150]}" for j in journals]
+        journal_ctx = '\nRecent journals:\n' + '\n'.join(entries)
 
-Your role:
-- Be warm, empathetic, and non-judgmental
-- Listen actively and validate feelings
-- Offer practical, student-friendly coping strategies
-- Never diagnose or replace professional help
-- If the student seems in crisis, gently encourage professional support
-- Keep responses concise (2-4 sentences)
-- Use the student's name occasionally
+    checkins = DailyCheckIn.objects.filter(user=user).order_by('-date')[:7]
+    pattern_ctx = ''
+    if len(checkins) > 1:
+        avg_mood = sum(c.mood_score for c in checkins) / len(checkins)
+        avg_stress = sum(c.stress_score for c in checkins) / len(checkins)
+        pattern_ctx = f'\n7-day avg: mood={avg_mood:.1f}, stress={avg_stress:.1f}, checkins={len(checkins)}'
 
-Important: You are NOT a therapist. Always remind users to seek professional help for serious concerns."""
+    streak_obj = Streak.objects.filter(user=user).first()
+    streak_ctx = f'\nStreak: {streak_obj.current_streak} days' if streak_obj else ''
 
-    except Exception as e:
-        print(f'System prompt build failed: {e}')
-        return "You are MindMate AI, a compassionate mental health companion. Be warm and supportive."
+    mood = latest.mood_score if latest else 3
+    if mood <= 2:
+        tone = 'Be extra gentle, warm and validating. Never push. Acknowledge pain first. Avoid toxic positivity.'
+    elif mood == 3:
+        tone = 'Be friendly and curious. Ask open questions. Help them reflect without pressure.'
+    else:
+        tone = 'Be warm, celebratory and encouraging. You can be a bit upbeat and playful.'
 
+    return f"""You are MindMate AI, a compassionate mental health companion for university students.
 
-def call_ai_chat(system_prompt, messages):
-    try:
-        last_message = messages[-1]['content'] if messages else ''
-        full_message = f"{system_prompt}\n\nStudent: {last_message}"
+Tone: {tone}
 
-        response = client.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=full_message
-        )
-        return response.text.strip()
+Rules:
+- Keep responses to 2-4 sentences max
+- Always end with one follow-up question
+- Never diagnose or give clinical advice
+- If crisis is mentioned, gently suggest Samaritans: 116 123
+- Reference their data naturally, don't recite it robotically
+- Important: You are NOT a therapist. Always remind users to seek professional help for serious concerns.
 
-    except Exception as e:
-        print(f'AI chat failed: {e}')
-        return "I'm here with you. Something went wrong on my end — could you say that again?"
+User: {user.first_name or user.username}
+{checkin_ctx}{ai_ctx}{journal_ctx}{pattern_ctx}{streak_ctx}"""

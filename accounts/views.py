@@ -231,3 +231,36 @@ def reset_password(request):
 
 def password_change(request):
     return render(request, 'accounts/password_change.html')
+
+@login_required
+def password_change(request):
+    error = None
+
+    if request.method == 'POST':
+        old_password     = request.POST.get('old_password', '')
+        new_password     = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        if not old_password or not new_password or not confirm_password:
+            error = 'All fields are required.'
+        elif not request.user.check_password(old_password):
+            error = 'Old password is incorrect.'
+        elif len(new_password) < 8:
+            error = 'New password must be at least 8 characters.'
+        elif new_password != confirm_password:
+            error = 'New passwords do not match.'
+        else:
+            request.user.set_password(new_password)
+            request.user.save()
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+            # ✅ Done page pe redirect
+            return redirect('password_change_done')
+
+    return render(request, 'accounts/password_change.html', {
+        'error': error,
+    })
+
+
+def password_change_done(request):
+    return render(request, 'mood/password_change_done.html')

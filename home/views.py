@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from mood.models import MoodEntry
+from mood.models import DailyCheckIn, JournalEntry, Streak
 from django.db.models import Avg
 from datetime import timedelta
 from django.utils import timezone
@@ -12,46 +12,43 @@ def home(request):
 def dashboard(request):
     user = request.user
     now = timezone.now()
-    entries = MoodEntry.objects.filter(user=user).order_by('-created_at')
+    entries = DailyCheckIn.objects.filter(user=user).order_by('-date')
 
     # Avg stats
-    avg_stress = entries.aggregate(Avg('stress_level'))['stress_level__avg']
-    avg_sleep  = entries.aggregate(Avg('sleep_quality'))['sleep_quality__avg']
+    avg_stress = entries.aggregate(Avg('stress_score'))['stress_score__avg']
+    avg_sleep  = entries.aggregate(Avg('sleep_score'))['sleep_score__avg']
+    avg_mood   = entries.aggregate(Avg('mood_score'))['mood_score__avg']
 
-    # This month check-ins
-    this_month = entries.filter(created_at__month=now.month, created_at__year=now.year)
-    checkin_count = this_month.count()
+    # Total check-ins
     total_checkins = entries.count()
 
-    # Recent entries
+    # Recent 3 entries
     recent_entries = entries[:3]
 
     # Streak
-    streak = 0
-    for i in range(30):
-        day = now.date() - timedelta(days=i)
-        if entries.filter(created_at__date=day).exists():
-            streak += 1
-        else:
-            break
+    try:
+        streak_obj = Streak.objects.get(user=user)
+        streak = streak_obj.current_streak
+        longest_streak = streak_obj.longest_streak
+    except:
+        streak = 0
+        longest_streak = 0
 
-    # Longest streak
-    longest_streak = streak  # simple version
-
-    # Weekly score (avg of this week's entries, out of 100)
+    # Weekly score
     week_start = now.date() - timedelta(days=7)
-    week_entries = entries.filter(created_at__date__gte=week_start)
+    week_entries = entries.filter(date__gte=week_start)
     weekly_score = None
     latest_score = None
     score_status = "Complete your first check-in"
     if week_entries.exists():
         avg = week_entries.aggregate(
-            m=Avg('stress_level'), s=Avg('sleep_quality')
+            m=Avg('mood_score'),
+            s=Avg('sleep_score'),
+            st=Avg('stress_score'),
+            so=Avg('social_score'),
+            e=Avg('energy_score'),
         )
-        # stress inversely affects score, sleep positively
-        score = max(0, min(100, int(
-            (avg['s'] or 3) * 10 - (avg['m'] or 5) * 5 + 50
-        )))
+        score = int(((avg['m'] or 3) + (avg['s'] or 3) + (avg['st'] or 3) + (avg['so'] or 3) + (avg['e'] or 3)) / 5 * 20)
         weekly_score = score
         latest_score = score
         if score >= 70:
@@ -62,41 +59,41 @@ def dashboard(request):
             score_status = "Take care of yourself 💜"
 
     # Already checked in today?
-    already_checked_in = entries.filter(created_at__date=now.date()).exists()
+    already_checked_in = entries.filter(date=now.date()).exists()
 
-    # Latest checkin mood (for chat)
+    # Latest checkin mood
     latest_checkin_mood = 3
     if already_checked_in and entries.first():
-        latest_checkin_mood = entries.first().stress_level or 3
+        latest_checkin_mood = entries.first().mood_score or 3
 
-    # Journal count (placeholder — 0 if no journal model)
+    # Journal entries
     try:
-        from journal.models import JournalEntry
         journal_count = JournalEntry.objects.filter(user=user).count()
         recent_journals = JournalEntry.objects.filter(user=user).order_by('-created_at')[:3]
     except:
         journal_count = 0
         recent_journals = []
 
-    # AI data (simple logic)
+    # AI data
     ai_data = None
     if already_checked_in and entries.first():
         entry = entries.first()
-        stress = entry.stress_level
-        if stress >= 8:
+        stress = entry.stress_score
+        mood = entry.mood_score
+        if stress <= 2 or mood <= 2:
             risk = 'high'
-            reason = 'Very high stress detected'
-            insight = 'Your stress is quite high today. Please take breaks and breathe deeply.'
+            reason = 'High stress / Low mood detected'
+            insight = 'Your stress is quite high today. Please take breaks and breathe deeply. You are not alone. 💜'
             recs = ['Try 5-minute box breathing', 'Take a short walk outside', 'Talk to someone you trust']
-        elif stress >= 5:
+        elif stress == 3 or mood == 3:
             risk = 'medium'
             reason = 'Moderate stress'
             insight = 'Moderate stress detected. Small breaks can make a big difference today.'
-            recs = ['Listen to calming music', 'Drink water and stretch', 'Take short breaks between study sessions']
+            recs = ['Listen to calming music', 'Drink water and stretch', 'Take short breaks between sessions']
         else:
             risk = 'low'
             reason = 'Stress is manageable'
-            insight = 'You seem to be managing well today. Keep up the consistency!'
+            insight = 'You seem to be managing well today. Keep up the consistency! 🌟'
             recs = ['Maintain your sleep schedule', 'Stay socially connected', 'Keep journaling your feelings']
         ai_data = {
             'risk_level': risk,
@@ -109,7 +106,7 @@ def dashboard(request):
         'user': user,
         'avg_stress': round(avg_stress, 1) if avg_stress else 0,
         'avg_sleep': round(avg_sleep, 1) if avg_sleep else 0,
-        'checkin_count': checkin_count,
+        'avg_mood': round(avg_mood, 1) if avg_mood else 0,
         'total_checkins': total_checkins,
         'recent_entries': recent_entries,
         'streak': streak,

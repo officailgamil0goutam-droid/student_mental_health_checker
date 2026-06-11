@@ -46,7 +46,9 @@ select.form-input option { background: #1a1a35; }
 <div class="page">
 
   <a href="{% url 'profile_view' %}" class="back-link">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
     Back to Profile
   </a>
 
@@ -65,7 +67,8 @@ select.form-input option { background: #1a1a35; }
           <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Choose your avatar</div>
           <div class="avatar-emojis">
             {% for emoji in "🌙⭐🌸🦋🌊🔥💫🌿🎯🧠🦄🌻" %}
-            <div class="avatar-opt {% if profile.avatar == emoji %}selected{% endif %}" onclick="selectAvatar('{{ emoji }}')">{{ emoji }}</div>
+            <div class="avatar-opt {% if profile.avatar == emoji %}selected{% endif %}"
+                 onclick="selectAvatar('{{ emoji }}', event)">{{ emoji }}</div>
             {% endfor %}
           </div>
         </div>
@@ -75,11 +78,13 @@ select.form-input option { background: #1a1a35; }
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">First Name</label>
-          <input type="text" name="first_name" class="form-input" value="{{ request.user.first_name }}" placeholder="Your first name">
+          <input type="text" name="first_name" class="form-input"
+                 value="{{ request.user.first_name }}" placeholder="Your first name">
         </div>
         <div class="form-group">
           <label class="form-label">Last Name</label>
-          <input type="text" name="last_name" class="form-input" value="{{ request.user.last_name }}" placeholder="Your last name">
+          <input type="text" name="last_name" class="form-input"
+                 value="{{ request.user.last_name }}" placeholder="Your last name">
         </div>
       </div>
 
@@ -88,23 +93,30 @@ select.form-input option { background: #1a1a35; }
       <!-- STUDY INFO -->
       <div class="form-group">
         <label class="form-label">University / Institution</label>
-        <input type="text" name="university" class="form-input" value="{{ profile.university|default:'' }}" placeholder="e.g. University of Delhi">
+        <input type="text" name="university" class="form-input"
+               value="{{ profile.university|default:'' }}"
+               placeholder="e.g. University of Delhi">
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Year of Study</label>
           <select name="year_of_study" class="form-input">
             <option value="">Select year</option>
             {% for y in "1234" %}
-            <option value="{{ y }}" {% if profile.year_of_study == y %}selected{% endif %}>Year {{ y }}</option>
+            <option value="{{ y }}" {% if profile.year_of_study == y %}selected{% endif %}>
+              Year {{ y }}
+            </option>
             {% endfor %}
-            <option value="PG" {% if profile.year_of_study == "PG" %}selected{% endif %}>Postgraduate</option>
+            <option value="PG"  {% if profile.year_of_study == "PG"  %}selected{% endif %}>Postgraduate</option>
             <option value="PhD" {% if profile.year_of_study == "PhD" %}selected{% endif %}>PhD</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Subject Area</label>
-          <input type="text" name="subject_area" class="form-input" value="{{ profile.subject_area|default:'' }}" placeholder="e.g. Computer Science">
+          <input type="text" name="subject_area" class="form-input"
+                 value="{{ profile.subject_area|default:'' }}"
+                 placeholder="e.g. Computer Science">
         </div>
       </div>
 
@@ -112,10 +124,10 @@ select.form-input option { background: #1a1a35; }
         <label class="form-label">Pronouns</label>
         <select name="pronouns" class="form-input">
           <option value="">Prefer not to say</option>
-          <option value="he/him"   {% if profile.pronouns == "he/him" %}selected{% endif %}>he/him</option>
-          <option value="she/her"  {% if profile.pronouns == "she/her" %}selected{% endif %}>she/her</option>
-          <option value="they/them"{% if profile.pronouns == "they/them" %}selected{% endif %}>they/them</option>
-          <option value="any"      {% if profile.pronouns == "any" %}selected{% endif %}>any</option>
+          <option value="he/him"    {% if profile.pronouns == "he/him"    %}selected{% endif %}>he/him</option>
+          <option value="she/her"   {% if profile.pronouns == "she/her"   %}selected{% endif %}>she/her</option>
+          <option value="they/them" {% if profile.pronouns == "they/them" %}selected{% endif %}>they/them</option>
+          <option value="any"       {% if profile.pronouns == "any"       %}selected{% endif %}>any</option>
         </select>
       </div>
 
@@ -125,6 +137,7 @@ select.form-input option { background: #1a1a35; }
         <a href="{% url 'profile_view' %}" class="btn-cancel">Cancel</a>
         <button type="submit" class="btn-save">Save Changes</button>
       </div>
+
     </form>
   </div>
 </div>
@@ -132,7 +145,7 @@ select.form-input option { background: #1a1a35; }
 
 {% block extra_js %}
 <script>
-  function selectAvatar(emoji) {
+  function selectAvatar(emoji, event) {
     document.getElementById('avatar-input').value = emoji;
     document.getElementById('avatar-preview').textContent = emoji;
     document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
